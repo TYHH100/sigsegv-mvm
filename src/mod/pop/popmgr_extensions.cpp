@@ -2332,7 +2332,7 @@ namespace Mod::Pop::PopMgr_Extensions
 		DevMsg("Pass send\n");
 
 		if (state.m_ExtraLoadoutItemsNotify)
-			PrintToChat("\x07""7fd4ffThis mission allows you to equip custom items. Type !missionitems in chat to see available items for your class\n",player);
+			PrintToChat("\x07""7fd4ffThis 当前任务可以装备自定义物品,输入 !missionitems 查看你当前兵种可用的物品\n",player);
 
 		//auto explanation = Mod::Pop::Wave_Extensions::GetWaveExplanation(0);
 		
