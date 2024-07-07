@@ -4045,7 +4045,7 @@ namespace Mod::Pop::PopMgr_Extensions
 		SelectExtraLoadoutItemsInfoHandler *handler = new SelectExtraLoadoutItemsInfoHandler(player);
         IBaseMenu *menu = menus->GetDefaultStyle()->CreateMenu(handler, g_Ext.GetIdentity());
         
-        menu->SetDefaultTitle(CFmtStr("Extra loadout items (%s)", g_aPlayerClassNames_NonLocalized[id]));
+        menu->SetDefaultTitle(CFmtStr("自定义物品 (%s)", g_aPlayerClassNames_NonLocalized[id]));
         menu->SetMenuOptionFlags(MENUFLAG_BUTTON_EXIT);
 
 		for (size_t i = 0; i < state.m_ExtraLoadoutItems.size(); i++) {
@@ -4103,7 +4103,7 @@ namespace Mod::Pop::PopMgr_Extensions
 		SelectExtraLoadoutItemsClassHandler *handler = new SelectExtraLoadoutItemsClassHandler(player, autoHide);
         IBaseMenu *menu = menus->GetDefaultStyle()->CreateMenu(handler, g_Ext.GetIdentity());
         
-        menu->SetDefaultTitle("Extra loadout items");
+        menu->SetDefaultTitle("自定义物品");
         menu->SetMenuOptionFlags(MENUFLAG_BUTTON_EXIT);
 
 		bool has_class[TF_CLASS_COUNT] = {0};
@@ -4158,7 +4158,7 @@ namespace Mod::Pop::PopMgr_Extensions
 		SelectExtraLoadoutItemsHandler *handler = new SelectExtraLoadoutItemsHandler(player, autoHide);
         IBaseMenu *menu = menus->GetDefaultStyle()->CreateMenu(handler, g_Ext.GetIdentity());
         
-        menu->SetDefaultTitle(CFmtStr("Extra loadout items (%s)", g_aPlayerClassNames_NonLocalized[class_index]));
+        menu->SetDefaultTitle(CFmtStr("自定义物品 (%s)", g_aPlayerClassNames_NonLocalized[class_index]));
         menu->SetMenuOptionFlags(MENUFLAG_BUTTON_EXIT);
 
 		int wave = TFObjectiveResource()->m_nMannVsMachineWaveCount;
@@ -4229,7 +4229,7 @@ namespace Mod::Pop::PopMgr_Extensions
 		player->GetSteamID(&steamid);
 		if (!state.m_BoughtLoadoutItems[steamid].count(itemId)) {
 			char buf[256];
-			snprintf(buf, sizeof(buf), "Buy ($%d)", item.cost);
+			snprintf(buf, sizeof(buf), "买 ($%d)", item.cost);
 			ItemDrawInfo info1(buf, player->GetCurrency() >= item.cost ? ITEMDRAW_DEFAULT : ITEMDRAW_DISABLED);
 			menu->AppendItem("Buy", info1);
 		}
@@ -4237,16 +4237,16 @@ namespace Mod::Pop::PopMgr_Extensions
 		if (state.m_BoughtLoadoutItems[steamid].count(itemId)) {
 			if (state.m_SelectedLoadoutItems[steamid].count(itemId)) {
 				ItemDrawInfo info1("Unequip", ITEMDRAW_DEFAULT);
-				menu->AppendItem("Unequip", info1);
+				menu->AppendItem("取消装备", info1);
 			}
 			else {
 				ItemDrawInfo info1("Equip", ITEMDRAW_DEFAULT);
-				menu->AppendItem("Equip", info1);
+				menu->AppendItem("装备", info1);
 			}
 
 			if (item.allow_refund) {
 				char buf[256];
-				snprintf(buf, sizeof(buf), "Sell ($%d)", item.cost);
+				snprintf(buf, sizeof(buf), "卖 ($%d)", item.cost);
 				ItemDrawInfo info2("Sell", ITEMDRAW_DEFAULT);
 				menu->AppendItem("Sell", info2);
 			}
