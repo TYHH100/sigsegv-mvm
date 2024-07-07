@@ -2332,7 +2332,7 @@ namespace Mod::Pop::PopMgr_Extensions
 		DevMsg("Pass send\n");
 
 		if (state.m_ExtraLoadoutItemsNotify)
-			PrintToChat("\x07""7fd4ff当前任务可以装备自定义物品,输入!missionitems查看你当前兵种可用的物品\n",player);
+			PrintToChat("\x07""7fd4ff>当前任务可以装备自定义物品,输入!missionitems查看你当前兵种可用的物品\n",player);
 
 		//auto explanation = Mod::Pop::Wave_Extensions::GetWaveExplanation(0);
 		
@@ -2362,7 +2362,7 @@ namespace Mod::Pop::PopMgr_Extensions
 			state.m_SandmanStuns.Get() ||
 			state.m_bNoReanimators
 		)) { 
-			PrintToChat("\x07""7fd4ff输入!missioninfo查看自定义任务信息\n",player);
+			PrintToChat("\x07""7fd4ff>输入!missioninfo查看自定义任务信息\n",player);
 		}
 	}
 
@@ -4180,7 +4180,7 @@ namespace Mod::Pop::PopMgr_Extensions
 				}
 
 				char buf[256];
-				snprintf(buf, sizeof(buf), "%s: %s %s %s", loadoutStrings[item.loadout_slot], item.name.c_str(), cost, selected ? "(selected)" : "");
+				snprintf(buf, sizeof(buf), "%s: %s %s %s", loadoutStrings[item.loadout_slot], item.name.c_str(), cost, selected ? "(已选中)" : "");
 				ItemDrawInfo info1(buf, ITEMDRAW_DEFAULT);
 				std::string num = std::to_string(i);
 				menu->AppendItem(num.c_str(), info1);
