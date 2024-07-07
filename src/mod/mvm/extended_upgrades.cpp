@@ -432,7 +432,7 @@ namespace Mod::MvM::Extended_Upgrades
         void *menu = nullptr;
         if (menus->GetDefaultStyle()->GetClientMenu(ENTINDEX(player), &menu) == MenuSource_BaseMenu && menu != nullptr) {
             auto title = ((IBaseMenu *)menu)->GetDefaultTitle();
-            return title != nullptr && (FStrEq(title, "Player Upgrades") || FStrEq(title, "Extended Upgrades Menu") || StringStartsWith(title, "Upgrades for"));
+            return title != nullptr && (FStrEq(title, "玩家升级") || FStrEq(title, "扩展升级菜单") || StringStartsWith(title, "Upgrades for"));
             /*auto handler = ((IBaseMenu *)menu)->GetHandler();
             if (handler != nullptr && (dynamic_cast<SelectUpgradeWeaponHandler *>(handler) != nullptr || dynamic_cast<SelectUpgradeListHandler *>(handler) != nullptr)) {
                 return true;
@@ -462,9 +462,9 @@ namespace Mod::MvM::Extended_Upgrades
         int level = 1;
         std::string name="";
         FOR_EACH_SUBKEY(kv, subkey) {
-            if (FStrEq(subkey->GetName(), "Upgrade"))
+            if (FStrEq(subkey->GetName(), "升级"))
                 name = subkey->GetString();
-            else if (FStrEq(subkey->GetName(), "Level"))
+            else if (FStrEq(subkey->GetName(), "级"))
                 level = subkey->GetInt();
         }
         if (name != "") {
@@ -491,15 +491,15 @@ namespace Mod::MvM::Extended_Upgrades
 
     int GetSlotFromString(const char *string) {
         int slot = -1;
-        if (V_stricmp(string, "Primary") == 0)
+        if (V_stricmp(string, "主武器") == 0)
             slot = 0;
-        else if (V_stricmp(string, "Secondary") == 0)
+        else if (V_stricmp(string, "副武器") == 0)
             slot = 1;
-        else if (V_stricmp(string, "Melee") == 0)
+        else if (V_stricmp(string, "近战武器") == 0)
             slot = 2;
         else if (V_stricmp(string, "PDA") == 0)
             slot = 5;
-        else if (V_stricmp(string, "Canteen") == 0 || V_stricmp(string, "Action") == 0)
+        else if (V_stricmp(string, "水壶") == 0 || V_stricmp(string, "Action") == 0)
             slot = 9;
         else
             slot = strtol(string, nullptr, 10);
