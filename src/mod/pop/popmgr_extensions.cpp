@@ -2332,7 +2332,7 @@ namespace Mod::Pop::PopMgr_Extensions
 		DevMsg("Pass send\n");
 
 		if (state.m_ExtraLoadoutItemsNotify)
-			PrintToChat("\x07""7fd4ff>当前任务可以装备自定义物品，输入!missionitems查看你游玩兵种可用的物品。\n",player);
+			PrintToChat("\x07""7fd4ff>当前任务可以装备自定义物品,输入!missionitems查看你游玩兵种可用的物品.\n",player);
 
 		//auto explanation = Mod::Pop::Wave_Extensions::GetWaveExplanation(0);
 		
@@ -2362,7 +2362,7 @@ namespace Mod::Pop::PopMgr_Extensions
 			state.m_SandmanStuns.Get() ||
 			state.m_bNoReanimators
 		)) { 
-			PrintToChat("\x07""7fd4ff>输入!missioninfo以查看自定义任务信息。\n",player);
+			PrintToChat("\x07""7fd4ff>输入!missioninfo以查看自定义任务信息.\n",player);
 		}
 	}
 
