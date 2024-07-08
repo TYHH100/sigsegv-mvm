@@ -4246,8 +4246,8 @@ namespace Mod::Pop::PopMgr_Extensions
 
 			if (item.allow_refund) {
 				char buf[256];
-				snprintf(buf, sizeof(buf), "卖 ($%d)", item.cost);
-				ItemDrawInfo info2("卖", ITEMDRAW_DEFAULT);
+				snprintf(buf, sizeof(buf), "售出 ($%d)", item.cost);
+				ItemDrawInfo info2("售出", ITEMDRAW_DEFAULT);
 				menu->AppendItem("Sell", info2);
 			}
 		}

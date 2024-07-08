@@ -1182,12 +1182,12 @@ namespace Mod::MvM::Extended_Upgrades
 
             if (enabled) {
 
-                char text[512];
+                char text[2048];
                 if (upgrade->increment != 0 && max_step < 100000 ) {
-                    snprintf(text, 512, "%s (%d/%d) $%d", upgrade->name.c_str(), cur_step, max_step, upgrade->cost);
+                    snprintf(text, 2048, "%s (%d/%d) $%d", upgrade->name.c_str(), cur_step, max_step, upgrade->cost);
                 }
                 else { // If increment == 0 or max steps less than 100000, pretend unlimited upgrades
-                    snprintf(text, 512, "%s $%d", upgrade->name.c_str(), upgrade->cost);
+                    snprintf(text, 2048, "%s $%d", upgrade->name.c_str(), upgrade->cost);
                 }
 
                 ItemDrawInfo info1(text, 
@@ -1209,12 +1209,12 @@ namespace Mod::MvM::Extended_Upgrades
             }
             else if (upgrade->show_requirements && disabled_reason != "") {
 
-                char text[512];
+                char text[2048];
                 if (upgrade->increment != 0 && max_step < 100000) {
-                    snprintf(text, 512, "%s: %s (%d/%d) $%d", upgrade->name.c_str(), disabled_reason.c_str(), cur_step, max_step, upgrade->cost);
+                    snprintf(text, 2048, "%s: %s (%d/%d) $%d", upgrade->name.c_str(), disabled_reason.c_str(), cur_step, max_step, upgrade->cost);
                 }
                 else { // If increment == 0 or max steps less than 100000, pretend unlimited upgrades
-                    snprintf(text, 512, "%s: %s $%d", upgrade->name.c_str(), disabled_reason.c_str(), upgrade->cost);
+                    snprintf(text, 2048, "%s: %s $%d", upgrade->name.c_str(), disabled_reason.c_str(), upgrade->cost);
                 }
 
                 ItemDrawInfo info1(text, ITEMDRAW_DISABLED);
