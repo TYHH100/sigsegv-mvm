@@ -122,7 +122,7 @@ public:
     
     virtual const char *GetInfo() const override
     {
-        static char buf[2048];
+        static char buf[64];
         if (strnicmp(m_strClassname.c_str(), "tf_weapon_", strlen("tf_weapon_")) == 0) {
             snprintf(buf, sizeof(buf), "Weapon type: %s", m_strClassname.c_str() + strlen("tf_weapon_"));
         }
@@ -253,7 +253,7 @@ public:
     
     virtual const char *GetInfo() const override
     {
-        static char buf[2048];
+        static char buf[64];
         if (m_iSlot >= 0) {
             snprintf(buf, sizeof(buf), "Weapon in slot: %s", g_szLoadoutStrings[m_iSlot]);
         }
