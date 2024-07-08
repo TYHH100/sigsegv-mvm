@@ -432,7 +432,7 @@ namespace Mod::MvM::Extended_Upgrades
         void *menu = nullptr;
         if (menus->GetDefaultStyle()->GetClientMenu(ENTINDEX(player), &menu) == MenuSource_BaseMenu && menu != nullptr) {
             auto title = ((IBaseMenu *)menu)->GetDefaultTitle();
-            return title != nullptr && (FStrEq(title, "Player Upgrades") || FStrEq(title, "Extended Upgrades Menu") || StringStartsWith(title, "Upgrades for"));
+            return title != nullptr && (FStrEq(title, "玩家升级") || FStrEq(title, "Extended Upgrades Menu") || StringStartsWith(title, "Upgrades for"));
             /*auto handler = ((IBaseMenu *)menu)->GetHandler();
             if (handler != nullptr && (dynamic_cast<SelectUpgradeWeaponHandler *>(handler) != nullptr || dynamic_cast<SelectUpgradeListHandler *>(handler) != nullptr)) {
                 return true;
@@ -1231,7 +1231,7 @@ namespace Mod::MvM::Extended_Upgrades
         }
 
         if(!Mod::Pop::PopMgr_Extensions::ExtendedUpgradesNoUndo()){
-            ItemDrawInfo info1("Undo upgrades");
+            ItemDrawInfo info1("退款升级");
             menu->AppendItem("1000", info1);
         }
         /*if (upgrades.size() == 1) {
