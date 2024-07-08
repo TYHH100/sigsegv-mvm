@@ -203,11 +203,11 @@ namespace ColorSpew
 	{
 		int c = map_ANSI16.Map(*GetSpewOutputColor());
 
-		char text[256];
+		char text[512];
 		if (c < 8) {
-			snprintf(text, 256, "\e[%dm" "%s" "\e[0m", 30 + c, pMsg);
+			snprintf(text, 512, "\e[%dm" "%s" "\e[0m", 30 + c, pMsg);
 		} else {
-			snprintf(text, 256, "\e[%d;1m" "%s" "\e[0m", 30 + (c - 8), pMsg);
+			snprintf(text, 512, "\e[%d;1m" "%s" "\e[0m", 30 + (c - 8), pMsg);
 		}
 		
 		return s_SpewOutputBackup(type, pMsg);
@@ -218,8 +218,8 @@ namespace ColorSpew
 	{
 		int c = map_ANSI256.Map(*GetSpewOutputColor());
 		
-		char text[256];
-		snprintf(text, 256, "\e[38;2;%dm" "%s" "\e[0m", 16 + c, pMsg);
+		char text[512];
+		snprintf(text, 512, "\e[38;2;%dm" "%s" "\e[0m", 16 + c, pMsg);
 		
 		return s_SpewOutputBackup(type, pMsg);
 	}
@@ -229,8 +229,8 @@ namespace ColorSpew
 	{
 		Color c = *GetSpewOutputColor();
 		
-		char text[256];
-		snprintf(text, 256, "\e[38;2;%d;%d;%dm" "%s" "\e[0m", c.r(), c.g(), c.b(), pMsg);
+		char text[512];
+		snprintf(text, 512, "\e[38;2;%d;%d;%dm" "%s" "\e[0m", c.r(), c.g(), c.b(), pMsg);
 		
 		return s_SpewOutputBackup(type, text);
 	}

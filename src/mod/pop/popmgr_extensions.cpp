@@ -175,7 +175,7 @@ namespace Mod::Pop::PopMgr_Extensions
 				TFGameRules()->SetCustomUpgradesFile(convalue.c_str());
 				if (force && last_custom_upgrades != convalue) {
 					received_message_tick = true;
-					PrintToChatAll("\x07""ffb200This server uses custom upgrades. Make sure you have enabled downloads in options (Download all files or Don't download sound files)");
+					PrintToChatAll("\x07""ffb200>当前任务正在使用自定义升级.确保你在设置中启用了下载(下载全部文件，或下载除音频之外的文件).");
 				}
 				last_custom_upgrades = convalue;
 			}
@@ -2158,7 +2158,7 @@ namespace Mod::Pop::PopMgr_Extensions
 			CONVAR_SCOPE_VALUE(tf_mvm_endless_force_on, 1);
 			
 			if (state.m_bSingleClassAllowed != -1) {
-				gamehelpers->TextMsg(ENTINDEX(player), TEXTMSG_DEST_CENTER, CFmtStr("%s %s %s", "Only",g_aRawPlayerClassNames[state.m_bSingleClassAllowed],"class is allowed in this mission"));
+				gamehelpers->TextMsg(ENTINDEX(player), TEXTMSG_DEST_CENTER, CFmtStr("%s %s %s", "只允许",g_aRawPlayerClassNames[state.m_bSingleClassAllowed],"兵种在当前任务"));
 
 				player->HandleCommand_JoinClass(g_aRawPlayerClassNames[state.m_bSingleClassAllowed]);
 
@@ -2245,7 +2245,7 @@ namespace Mod::Pop::PopMgr_Extensions
         void *menu = nullptr;
         if (menus->GetDefaultStyle()->GetClientMenu(ENTINDEX(player), &menu) == MenuSource_BaseMenu && menu != nullptr) {
 			auto title = ((IBaseMenu *)menu)->GetDefaultTitle();
-			if (title != nullptr && StringStartsWith(title, "Extra loadout items")) {
+			if (title != nullptr && StringStartsWith(title, "额外可选物品")) {
 				CancelClientMenu(player);
 			}
 		}
@@ -2432,7 +2432,7 @@ namespace Mod::Pop::PopMgr_Extensions
 				state.m_PlayerUpgradeSend.insert(player);
 				ResendUpgradeFile(false);
 				if (!received_message_tick) {
-					PrintToChat("\x07""ffb200>当前任务正在使用自定义升级。确保你在设置中启用了下载（下载全部文件，或下载除音频之外的文件）。\n",player);
+					PrintToChat("\x07""ffb200>当前任务正在使用自定义升级.确保你在设置中启用了下载(下载全部文件，或下载除音频之外的文件).\n",player);
 					
 				}
 			}
@@ -3664,35 +3664,35 @@ namespace Mod::Pop::PopMgr_Extensions
 				}
 			}
 			if (!player_empty) {
-				ItemDrawInfo info1("Player Attributes", ITEMDRAW_DEFAULT);
+				ItemDrawInfo info1("玩家属性", ITEMDRAW_DEFAULT);
 				menu->AppendItem("playerattributes", info1);
 			}
 			if (!state.m_DisallowedUpgrades.empty()) {
-				ItemDrawInfo info1("Disallowed Upgrades", ITEMDRAW_DEFAULT);
+				ItemDrawInfo info1("被禁用的升级", ITEMDRAW_DEFAULT);
 				menu->AppendItem("disallowedupgrades", info1);
 			}
 			if (!state.m_ItemReplace.empty()) {
-				ItemDrawInfo info1("Item Replacement", ITEMDRAW_DEFAULT);
+				ItemDrawInfo info1("物品替换", ITEMDRAW_DEFAULT);
 				menu->AppendItem("itemreplace", info1);
 			}
 			if (!state.m_ExtraLoadoutItems.empty()) {
-				ItemDrawInfo info1("Extra Loadout Items", ITEMDRAW_DEFAULT);
+				ItemDrawInfo info1("额外可选物品", ITEMDRAW_DEFAULT);
 				menu->AppendItem("extraloadoutitems", info1);
 			}
 			if (state.m_ForceItems.parsed) {
-				ItemDrawInfo info1("Forced Items", ITEMDRAW_DEFAULT);
+				ItemDrawInfo info1("强制装备的物品", ITEMDRAW_DEFAULT);
 				menu->AppendItem("forceditems", info1);
 			}
 			if (state.m_bSniperAllowHeadshots) {
-				ItemDrawInfo info1("Sniper bots can headshot", ITEMDRAW_DISABLED);
+				ItemDrawInfo info1("Sniper bots 可以爆头", ITEMDRAW_DISABLED);
 				menu->AppendItem("", info1);
 			}
 			if (state.m_bSniperHideLasers) {
-				ItemDrawInfo info1("No laser on Sniper bots", ITEMDRAW_DISABLED);
+				ItemDrawInfo info1("Sniper bots 没有激光瞄准线", ITEMDRAW_DISABLED);
 				menu->AppendItem("", info1);
 			}
 			if (!state.m_RespecEnabled.Get()) {
-				ItemDrawInfo info1("Upgrade refunding disabled", ITEMDRAW_DISABLED);
+				ItemDrawInfo info1("已禁用升级退款", ITEMDRAW_DISABLED);
 				menu->AppendItem("", info1);
 			}
 			if (state.m_RespecLimit.Get() != 0) {
@@ -3701,26 +3701,26 @@ namespace Mod::Pop::PopMgr_Extensions
 				menu->AppendItem("", info1);
 			}
 			if (state.m_ImprovedAirblast.Get()) {
-				ItemDrawInfo info1("Pyro bots can airblast grenades and arrows", ITEMDRAW_DISABLED);
+				ItemDrawInfo info1("Pyro bots 会气爆飞行物", ITEMDRAW_DISABLED);
 				menu->AppendItem("", info1);
 			}
 			if (state.m_SandmanStuns.Get()) {
-				ItemDrawInfo info1("Sandman balls can stun enemy targets", ITEMDRAW_DISABLED);
+				ItemDrawInfo info1("睡魔的球可以击晕", ITEMDRAW_DISABLED);
 				menu->AppendItem("", info1);
 			}
 			if (state.m_bNoReanimators) {
-				ItemDrawInfo info1("No reanimators", ITEMDRAW_DISABLED);
+				ItemDrawInfo info1("没有复活标记", ITEMDRAW_DISABLED);
 				menu->AppendItem("", info1);
 			}
 			
 		}
-		DevMsg("Item Count %d\n", menu->GetItemCount());
+		DevMsg("物品数量 %d\n", menu->GetItemCount());
 		if (menu->GetItemCount() == 1) {
             ItemDrawInfo info1(" ", ITEMDRAW_NOTEXT);
             menu->AppendItem(" ", info1);
         }
 		else if (menu->GetItemCount() == 0) {
-            ItemDrawInfo info1("No custom mission information available", ITEMDRAW_DISABLED);
+            ItemDrawInfo info1("没有自定义任务信息", ITEMDRAW_DISABLED);
             menu->AppendItem(" ", info1);
             ItemDrawInfo info2(" ", ITEMDRAW_NOTEXT);
             menu->AppendItem(" ", info2);
@@ -3989,7 +3989,7 @@ namespace Mod::Pop::PopMgr_Extensions
 		SelectForcedItemsInfoHandler *handler = new SelectForcedItemsInfoHandler(player);
         IBaseMenu *menu = menus->GetDefaultStyle()->CreateMenu(handler, g_Ext.GetIdentity());
         
-        menu->SetDefaultTitle(CFmtStr("Forced items (%s)", g_aPlayerClassNames_NonLocalized[id]));
+        menu->SetDefaultTitle(CFmtStr("强制装备的物品 (%s)", g_aPlayerClassNames_NonLocalized[id]));
         menu->SetMenuOptionFlags(MENUFLAG_BUTTON_EXIT);
 
 		for (auto &items_class : {state.m_ForceItems.items, state.m_ForceItems.items_no_remove}) {
@@ -4236,18 +4236,18 @@ namespace Mod::Pop::PopMgr_Extensions
 
 		if (state.m_BoughtLoadoutItems[steamid].count(itemId)) {
 			if (state.m_SelectedLoadoutItems[steamid].count(itemId)) {
-				ItemDrawInfo info1("Unequip", ITEMDRAW_DEFAULT);
-				menu->AppendItem("取消装备", info1);
+				ItemDrawInfo info1("取消装备", ITEMDRAW_DEFAULT);
+				menu->AppendItem("Unequip", info1);
 			}
 			else {
-				ItemDrawInfo info1("Equip", ITEMDRAW_DEFAULT);
-				menu->AppendItem("装备", info1);
+				ItemDrawInfo info1("装备", ITEMDRAW_DEFAULT);
+				menu->AppendItem("Equip", info1);
 			}
 
 			if (item.allow_refund) {
 				char buf[256];
 				snprintf(buf, sizeof(buf), "卖 ($%d)", item.cost);
-				ItemDrawInfo info2("Sell", ITEMDRAW_DEFAULT);
+				ItemDrawInfo info2("卖", ITEMDRAW_DEFAULT);
 				menu->AppendItem("Sell", info2);
 			}
 		}
