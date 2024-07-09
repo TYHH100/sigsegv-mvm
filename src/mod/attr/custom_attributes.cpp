@@ -364,7 +364,7 @@ namespace Mod::Attr::Custom_Attributes
 	void FireInputAttribute(const char *input, const char *filter, const variant_t &defValue, CBaseEntity *inflictor, CBaseEntity *activator, CBaseEntity *caller, float delay)
 	{
 		if (input != nullptr && (filter == nullptr || caller->NameMatches(filter) || caller->ClassMatches(filter))) {
-			char input_tokenized[2048];
+			char input_tokenized[512];
 			V_strncpy(input_tokenized, input, sizeof(input_tokenized));
 			
 			char *target = strtok(input_tokenized,"^");
@@ -7428,8 +7428,8 @@ namespace Mod::Attr::Custom_Attributes
 		if (players_informed_about_viewmodel[player->entindex()]) return true;
 
 		players_informed_about_viewmodel[player->entindex()] = true;
-		char pathinfo[2048];
-		snprintf(pathinfo, 2048, "%si%llu", disallowed_viewmodel_path.c_str(), player->GetSteamID().ConvertToUint64());
+		char pathinfo[512];
+		snprintf(pathinfo, 512, "%si%llu", disallowed_viewmodel_path.c_str(), player->GetSteamID().ConvertToUint64());
 		auto file = fopen(pathinfo, "w");
 		if (file) {
 			fclose(file);
@@ -7443,11 +7443,11 @@ namespace Mod::Attr::Custom_Attributes
 	DETOUR_DECL_MEMBER(void, CServerGameClients_ClientPutInServer, edict_t *edict, const char *playername)
 	{
         DETOUR_MEMBER_CALL(CServerGameClients_ClientPutInServer)(edict, playername);
-		char path[2048];
+		char path[512];
 		auto player = ((CTFPlayer*) edict->GetUnknown());
-		snprintf(path, 2048, "%s%llu", disallowed_viewmodel_path.c_str(), player->GetSteamID().ConvertToUint64());
-		char pathinfo[2048];
-		snprintf(pathinfo, 2048, "%si%llu", disallowed_viewmodel_path.c_str(), player->GetSteamID().ConvertToUint64());
+		snprintf(path, 512, "%s%llu", disallowed_viewmodel_path.c_str(), player->GetSteamID().ConvertToUint64());
+		char pathinfo[512];
+		snprintf(pathinfo, 512, "%si%llu", disallowed_viewmodel_path.c_str(), player->GetSteamID().ConvertToUint64());
 
 		cell_t result = access(path, F_OK) != 0;
 		viewmodels_enabled_forward->PushCell(edict->m_EdictIndex);
@@ -7462,8 +7462,8 @@ namespace Mod::Attr::Custom_Attributes
 		auto &disallowed = players_viewmodel_disallowed[player->entindex()];
 		disallowed = !disallowed;
 
-		char path[2048];
-		snprintf(path, 2048, "%s%llu", disallowed_viewmodel_path.c_str(), player->GetSteamID().ConvertToUint64());
+		char path[512];
+		snprintf(path, 512, "%s%llu", disallowed_viewmodel_path.c_str(), player->GetSteamID().ConvertToUint64());
 		if (disallowed) {
 			auto file = fopen(path, "w");
 			if (file) {
