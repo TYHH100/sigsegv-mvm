@@ -7445,7 +7445,7 @@ namespace Mod::Attr::Custom_Attributes
 	bool IsCustomViewmodelAllowed(CTFPlayer *player) {
 		if (players_viewmodel_disallowed[player->entindex()]) {
 			if (!players_viewmodel_informed_about_disallowed[player->entindex()]) {
-				PrintToChat("Custom hand models disabled. Type !defaulthands to enable\n", player);
+				PrintToChat("自定义手部模型已禁用. 输入!defaulthands来启用\n", player);
 				players_viewmodel_informed_about_disallowed[player->entindex()] = true;
 			}
 			return false;
@@ -8356,7 +8356,7 @@ namespace Mod::Attr::Custom_Attributes
 				if (item_def != nullptr)
 					format_str.insert(0, CFmtStr("\n%s:\n\n", GetItemNameForDisplay(item_def)));
 				else
-					format_str.insert(0, "\nCharacter Attributes:\n\n");
+					format_str.insert(0, "\n人物属性:\n\n");
 
 				added_item_name = true;
 			}
