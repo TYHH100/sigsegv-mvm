@@ -432,7 +432,7 @@ namespace Mod::MvM::Extended_Upgrades
         void *menu = nullptr;
         if (menus->GetDefaultStyle()->GetClientMenu(ENTINDEX(player), &menu) == MenuSource_BaseMenu && menu != nullptr) {
             auto title = ((IBaseMenu *)menu)->GetDefaultTitle();
-            return title != nullptr && (FStrEq(title, "Player Upgrades") || FStrEq(title, "Extended Upgrades Menu") || StringStartsWith(title, "Upgrades for"));
+            return title != nullptr && (FStrEq(title, "玩家升级") || FStrEq(title, "Extended Upgrades Menu") || StringStartsWith(title, "Upgrades for"));
             /*auto handler = ((IBaseMenu *)menu)->GetHandler();
             if (handler != nullptr && (dynamic_cast<SelectUpgradeWeaponHandler *>(handler) != nullptr || dynamic_cast<SelectUpgradeListHandler *>(handler) != nullptr)) {
                 return true;
@@ -1182,12 +1182,12 @@ namespace Mod::MvM::Extended_Upgrades
 
             if (enabled) {
 
-                char text[128];
+                char text[2048];
                 if (upgrade->increment != 0 && max_step < 100000 ) {
-                    snprintf(text, 128, "%s (%d/%d) $%d", upgrade->name.c_str(), cur_step, max_step, upgrade->cost);
+                    snprintf(text, 2048, "%s (%d/%d) $%d", upgrade->name.c_str(), cur_step, max_step, upgrade->cost);
                 }
                 else { // If increment == 0 or max steps less than 100000, pretend unlimited upgrades
-                    snprintf(text, 128, "%s $%d", upgrade->name.c_str(), upgrade->cost);
+                    snprintf(text, 2048, "%s $%d", upgrade->name.c_str(), upgrade->cost);
                 }
 
                 ItemDrawInfo info1(text, 
@@ -1209,12 +1209,12 @@ namespace Mod::MvM::Extended_Upgrades
             }
             else if (upgrade->show_requirements && disabled_reason != "") {
 
-                char text[128];
+                char text[2048];
                 if (upgrade->increment != 0 && max_step < 100000) {
-                    snprintf(text, 128, "%s: %s (%d/%d) $%d", upgrade->name.c_str(), disabled_reason.c_str(), cur_step, max_step, upgrade->cost);
+                    snprintf(text, 2048, "%s: %s (%d/%d) $%d", upgrade->name.c_str(), disabled_reason.c_str(), cur_step, max_step, upgrade->cost);
                 }
                 else { // If increment == 0 or max steps less than 100000, pretend unlimited upgrades
-                    snprintf(text, 128, "%s: %s $%d", upgrade->name.c_str(), disabled_reason.c_str(), upgrade->cost);
+                    snprintf(text, 2048, "%s: %s $%d", upgrade->name.c_str(), disabled_reason.c_str(), upgrade->cost);
                 }
 
                 ItemDrawInfo info1(text, ITEMDRAW_DISABLED);
@@ -1231,7 +1231,7 @@ namespace Mod::MvM::Extended_Upgrades
         }
 
         if(!Mod::Pop::PopMgr_Extensions::ExtendedUpgradesNoUndo()){
-            ItemDrawInfo info1("Undo upgrades");
+            ItemDrawInfo info1("退款升级");
             menu->AppendItem("1000", info1);
         }
         /*if (upgrades.size() == 1) {
@@ -1270,10 +1270,10 @@ namespace Mod::MvM::Extended_Upgrades
         SelectUpgradeWeaponHandler *handler = new SelectUpgradeWeaponHandler(player);
         IBaseMenu *menu = menus->GetDefaultStyle()->CreateMenu(handler, g_Ext.GetIdentity());
         
-        menu->SetDefaultTitle("Extended Upgrades Menu");
+        menu->SetDefaultTitle("Extended Upgrades Menu|扩展升级菜单");
         menu->SetMenuOptionFlags(0);
 
-        ItemDrawInfo info1("Player Upgrades", WeaponHasValidUpgrades(nullptr, player) ? ITEMDRAW_DEFAULT : ITEMDRAW_DISABLED);
+        ItemDrawInfo info1("Player Upgrades|玩家升级", WeaponHasValidUpgrades(nullptr, player) ? ITEMDRAW_DEFAULT : ITEMDRAW_DISABLED);
         menu->AppendItem("player", info1);
 
         for (loadout_positions_t slot : {
@@ -1300,12 +1300,12 @@ namespace Mod::MvM::Extended_Upgrades
         }
 
         static ConVarRef tf_mvm_respec_enabled("tf_mvm_respec_enabled");
-        ItemDrawInfo info2("Refund Upgrades", tf_mvm_respec_enabled.GetBool() ? ITEMDRAW_DEFAULT : ITEMDRAW_DISABLED);
+        ItemDrawInfo info2("Refund Upgrades|退款升级", tf_mvm_respec_enabled.GetBool() ? ITEMDRAW_DEFAULT : ITEMDRAW_DISABLED);
         menu->AppendItem("refund", info2);
 
         if (Mod::Pop::PopMgr_Extensions::HasExtraLoadoutItems(player->GetPlayerClass()->GetClassIndex())) {
             
-            ItemDrawInfo info3("Extra loadout items", ITEMDRAW_DEFAULT);
+            ItemDrawInfo info3("Extra loadout items|自定义物品", ITEMDRAW_DEFAULT);
             menu->AppendItem("extra", info3);
         }
 

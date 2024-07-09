@@ -18,28 +18,28 @@ extern std::map<int, std::string> g_AttribnamesShort;
 static const char *loadoutStrings[] = 
 {
     // Weapons & Equipment
-    "Primary",		// LOADOUT_POSITION_PRIMARY = 0,
-    "Secondary",	// LOADOUT_POSITION_SECONDARY,
-    "Melee",		// LOADOUT_POSITION_MELEE,
+    "翋挕ん",		// LOADOUT_POSITION_PRIMARY = 0,
+    "萵挕ん",	    // LOADOUT_POSITION_SECONDARY,
+    "輪桵挕ん",		// LOADOUT_POSITION_MELEE,
     "Utility",		// LOADOUT_POSITION_UTILITY,
-    "Building",		// LOADOUT_POSITION_BUILDING,
+    "膘耟",		    // LOADOUT_POSITION_BUILDING,
     "PDA",			// LOADOUT_POSITION_PDA,
-    "PDA 2",			// LOADOUT_POSITION_PDA2,
+    "PDA 2",		// LOADOUT_POSITION_PDA2,
 
     // Wearables
-    "Head",			// LOADOUT_POSITION_HEAD,
-    "Misc",			// LOADOUT_POSITION_MISC,
-    "Action",		// LOADOUT_POSITION_ACTION,
-    "Misc 2",   	// LOADOUT_POSITION_MISC2
+    "芛窒庉こ",		// LOADOUT_POSITION_HEAD,
+    "旯极庉こ1",	// LOADOUT_POSITION_MISC,
+    "雄釬",		    // LOADOUT_POSITION_ACTION,
+    "旯极庉こ2",   	// LOADOUT_POSITION_MISC2
 
-    "Taunt 1",		// LOADOUT_POSITION_TAUNT
-    "Taunt 2",		// LOADOUT_POSITION_TAUNT2
-    "Taunt 3",		// LOADOUT_POSITION_TAUNT3
-    "Taunt 4",		// LOADOUT_POSITION_TAUNT4
-    "Taunt 5",		// LOADOUT_POSITION_TAUNT5
-    "Taunt 6",		// LOADOUT_POSITION_TAUNT6
-    "Taunt 7",		// LOADOUT_POSITION_TAUNT7
-    "Taunt 8",		// LOADOUT_POSITION_TAUNT8
+    "1瘍陸當",		// LOADOUT_POSITION_TAUNT
+    "2瘍陸當",		// LOADOUT_POSITION_TAUNT2
+    "3瘍陸當",		// LOADOUT_POSITION_TAUNT3
+    "4瘍陸當",		// LOADOUT_POSITION_TAUNT4
+    "5瘍陸當",		// LOADOUT_POSITION_TAUNT5
+    "6瘍陸當",		// LOADOUT_POSITION_TAUNT6
+    "7瘍陸當",		// LOADOUT_POSITION_TAUNT7
+    "8瘍陸當",		// LOADOUT_POSITION_TAUNT8
 };
 	
 static int GetSlotFromString(const char *string) {
