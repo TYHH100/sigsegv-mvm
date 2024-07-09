@@ -1,4 +1,4 @@
-
+#ifndef CSGO_SEPARETE_
 //========= Copyright Valve Corporation, All rights reserved. ============//
 //
 // Purpose: Utility functions for using debug overlays to visualize information
@@ -754,3 +754,4 @@ void NDebugOverlay::ScreenLine(float xFrom, float yFrom, float xTo, float yTo, c
 void NDebugOverlay::ScreenLine(float xFrom, float yFrom, float xTo, float yTo, const Color& color, float flDuration)
 {
 }
+#endif

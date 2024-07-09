@@ -47,20 +47,20 @@ public:
 
 	INetChannel		*m_NetChannel;
 	int				m_nSignonState;
-	int             pad;
 	int				m_nDeltaTick;
 	int				m_nStringTableAckTick;
 	int				m_nSignonTick;
-	void * m_pLastSnapshot; //0x0dc
+	void * m_pLastSnapshot;
+	int pad;
 
-	CFrameSnapshot	*m_pBaseline; //0x0e0
-	int				m_nBaselineUpdateTick; // 0x0e4
-	CBitVec<MAX_EDICTS>	m_BaselinesSent; //0x0e8
-	int				m_nBaselineUsed; // 0x1e8
+	CFrameSnapshot	*m_pBaseline;
+	int				m_nBaselineUpdateTick;
+	CBitVec<MAX_EDICTS>	m_BaselinesSent;
+	int				m_nBaselineUsed;
 
-	int				m_nForceWaitForTick; // 0x1ec
+	int				m_nForceWaitForTick;
 	
-	bool			m_bFakePlayer; // 0x1f0
+	bool			m_bFakePlayer;
 private:
 	static MemberVFuncThunk<CBaseClient *, void>                 vt_UpdateSendState;
 	static MemberVFuncThunk<CBaseClient *, void, CClientFrame *> vt_SendSnapshot;
@@ -89,24 +89,17 @@ public:
 	int GetNumEdicts() {return *(int *)((uintptr_t)(this) + 0x1E4);}
 };
 
-class CClientFrameManager 
-{
-public:
-    int CountClientFrames()                { return ft_CountClientFrames(this); }
-    void RemoveOldestFrame()               {        ft_RemoveOldestFrame(this); }
-
-private:
-    static MemberFuncThunk<CClientFrameManager *, int>                 ft_CountClientFrames;
-    static MemberFuncThunk<CClientFrameManager *, void>                ft_RemoveOldestFrame;
-};
-
 class CHLTVServer : public IGameEventListener2, public CBaseServer
 {
 public:
     void StartMaster(CBaseClient *client)  {        ft_StartMaster(this, client); }
+    int CountClientFrames()                { return ft_CountClientFrames(this); }
+    void RemoveOldestFrame()               {        ft_RemoveOldestFrame(this); }
     
 private:
     static MemberFuncThunk<CHLTVServer *, void, CBaseClient *> ft_StartMaster;
+    static MemberFuncThunk<CHLTVServer *, int>                 ft_CountClientFrames;
+    static MemberFuncThunk<CHLTVServer *, void>                ft_RemoveOldestFrame;
 };
 
 class CGameClient : public CBaseClient
@@ -197,14 +190,6 @@ class CEntityFactoryDictionary : public IEntityFactoryDictionary
 {
 public:
 	CUtlDict< IEntityFactory *, unsigned short > m_Factories;
-};
-
-class CNetChan : public INetChannel
-{
-public:
-    bool IsFileInWaitingList(const char *filename) { return ft_IsFileInWaitingList(this, filename); }
-private:
-	static MemberFuncThunk<CNetChan *, bool, const char *> ft_IsFileInWaitingList;
 };
 
 

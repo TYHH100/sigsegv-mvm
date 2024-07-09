@@ -32,7 +32,6 @@ public:
 	void RemovePlayerAndItemUpgradesFromHistory( CTFPlayer *pPlayer )            { return ft_RemovePlayerAndItemUpgradesFromHistory(this, pPlayer); }
 	static void FindDefaultPopulationFileShortNames(CUtlVector<CUtlString> &vec) { return ft_FindDefaultPopulationFileShortNames(vec); }
 	CUtlVector< CUpgradeInfo > * GetPlayerUpgradeHistory(CTFPlayer *player)      { return ft_GetPlayerUpgradeHistory(this, player); }
-	const char *GetPopulationFilename()                                          { return ft_GetPopulationFilename(this); }
 	void SetPopulationFilename(const char *name)                                 { ft_SetPopulationFilename(this, name); }
 	int GetPlayerCurrencySpent(CTFPlayer *player)                                { return ft_GetPlayerCurrencySpent(this, player); }
 	void JumpToWave(int wave, float money = -1.0f)                               {        ft_JumpToWave (this, wave, money); }
@@ -56,7 +55,6 @@ private:
 	static MemberFuncThunk<CPopulationManager *, void, CTFPlayer *>             ft_RemovePlayerAndItemUpgradesFromHistory;
 	static MemberFuncThunk<CPopulationManager *, CUtlVector< CUpgradeInfo > *, CTFPlayer *>             ft_GetPlayerUpgradeHistory;
 	static MemberFuncThunk<CPopulationManager *, void, const char*> ft_SetPopulationFilename;
-	static MemberFuncThunk<CPopulationManager *, const char*>       ft_GetPopulationFilename;
 	static MemberFuncThunk<CPopulationManager *, int, CTFPlayer *> ft_GetPlayerCurrencySpent;
 	static MemberFuncThunk<CPopulationManager *, void, int, float> ft_JumpToWave;
 	static MemberFuncThunk<CPopulationManager *, PlayerUpgradeHistory *, CSteamID> ft_FindOrAddPlayerUpgradeHistory;
@@ -110,14 +108,7 @@ public:
 	CSpawnLocation m_where;
 	int m_totalCount;
 	int m_remainingCount;
-	// int m_nClassCounts;
-	// Use unused m_nClassCounts for something else
-	bool m_bPaused;
-	bool m_bHasTFBotSpawner;
-	bool m_bHasWaitForAll;
-	bool m_bHadSpawnState;
-	//
-	
+	CWaveSpawnExtra *extra;  // int m_nClassCounts;
 	int m_maxActive;						
 	int m_spawnCount;						
 	float m_waitBeforeStarting;
@@ -176,6 +167,16 @@ private:
 };
 
 class CRandomChoiceSpawner;
+
+class CWaveSpawnExtra
+{
+public:
+	bool m_bPaused = false;
+	bool m_bHasTFBotSpawner = false;
+	CUtlVector<CWaveSpawnPopulator *> m_waitForAllDeadList;
+	CUtlVector<CWaveSpawnPopulator *> m_waitForAllSpawnedList;
+	CRandomChoiceSpawner *randomChoiceShuffleSet = nullptr;
+};
 
 struct WaveClassCount_t
 {

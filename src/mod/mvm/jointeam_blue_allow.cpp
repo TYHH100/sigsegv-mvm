@@ -562,54 +562,24 @@ namespace Mod::MvM::JoinTeam_Blue_Allow
 	};
 
 	constexpr uint8_t s_Buf_CollectPlayers_Common_Regcall[] = {
-#ifdef PLATFORM_64BITS
-		0x48, 0xc7, 0x45, 0xc0, 0x00, 0x00, 0x00, 0x00,  // +0x0000 mov     [rbp+var_40], 0
-		0x48, 0xc7, 0x45, 0xc8, 0x00, 0x00, 0x00, 0x00,  // +0x0008 mov     [rbp+var_38], 0
-		0x48, 0xc7, 0x45, 0xd0, 0x00, 0x00, 0x00, 0x00,  // +0x0010 mov     [rbp+var_30], 0
-		0xe8, 0x54, 0xcc, 0xff, 0xff,                    // +0x0018 call    _Z14CollectPlayersI9CTFPlayerEiP10CUtlVectorIPT_10CUtlMemoryIS3_iEEibb_isra_0_12; CollectPlayers<CTFPlayer>(CUtlVector<CTFPlayer *,CUtlMemory<CTFPlayer *,int>> *,int,bool,bool) [clone]
-#else 
 		0xc7, 0x45, 0xd4, 0x00, 0x00, 0x00, 0x00,  // +0x0000 mov     [ebp+var_2C], 0
 		0xc7, 0x45, 0xd8, 0x00, 0x00, 0x00, 0x00,  // +0x0007 mov     [ebp+var_28], 0
 		0xc7, 0x45, 0xdc, 0x00, 0x00, 0x00, 0x00,  // +0x000e mov     [ebp+var_24], 0
 		0xc7, 0x45, 0xe0, 0x00, 0x00, 0x00, 0x00,  // +0x0015 mov     [ebp+var_20], 0
 		0xe8, 0x16, 0x97, 0xfe, 0xff,              // +0x001c call    _Z14CollectPlayersI9CTFPlayerEiP10CUtlVectorIPT_10CUtlMemoryIS3_iEEibb_isra_0_1; CollectPlayers<CTFPlayer>(CUtlVector<CTFPlayer *,CUtlMemory<CTFPlayer *,int>> *,int,bool,bool) [clone]
-#endif
 	};
 
 	constexpr uint8_t s_Mask_CollectPlayers_Common_Regcall[] = {
-#ifdef PLATFORM_64BITS
-		0xFF, 0xFF, 0xFF, 0x00, 0xFF, 0xFF, 0xFF, 0xFF,  // +0x0000 mov     [ebp+var_2C], 0
-		0xFF, 0xFF, 0xFF, 0x00, 0xFF, 0xFF, 0xFF, 0xFF,  // +0x0007 mov     [ebp+var_28], 0
-		0xFF, 0xFF, 0xFF, 0x00, 0xFF, 0xFF, 0xFF, 0xFF,  // +0x000e mov     [ebp+var_24], 0
-		0xFF, 0x00, 0x00, 0x00, 0x00,                    // +0x001c call    _Z14CollectPlayersI9CTFPlayerEiP10CUtlVectorIPT_10CUtlMemoryIS3_iEEibb_isra_0_1; CollectPlayers<CTFPlayer>(CUtlVector<CTFPlayer *,CUtlMemory<CTFPlayer *,int>> *,int,bool,bool) [clone]
-#else
 		0xFF, 0xFF, 0x00, 0xFF, 0xFF, 0xFF, 0xFF,  // +0x0000 mov     [ebp+var_2C], 0
 		0xFF, 0xFF, 0x00, 0xFF, 0xFF, 0xFF, 0xFF,  // +0x0007 mov     [ebp+var_28], 0
 		0xFF, 0xFF, 0x00, 0xFF, 0xFF, 0xFF, 0xFF,  // +0x000e mov     [ebp+var_24], 0
 		0xFF, 0xFF, 0x00, 0xFF, 0xFF, 0xFF, 0xFF,  // +0x0015 mov     [ebp+var_20], 0
 		0xFF, 0x00, 0x00, 0x00, 0x00,              // +0x001c call    _Z14CollectPlayersI9CTFPlayerEiP10CUtlVectorIPT_10CUtlMemoryIS3_iEEibb_isra_0_1; CollectPlayers<CTFPlayer>(CUtlVector<CTFPlayer *,CUtlMemory<CTFPlayer *,int>> *,int,bool,bool) [clone]
-#endif
 	};
 	
-#ifdef PLATFORM_64BITS
-	constexpr uintptr_t s_CallOff_CollectPlayers_Common_Regcall = 0x18;
-#else
 	constexpr uintptr_t s_CallOff_CollectPlayers_Common_Regcall = 0x1c;
-#endif
 
 	constexpr uint8_t s_Buf_CPopulationManager_RestorePlayerCurrency[] = {
-#ifdef PLATFORM_64BITS
-		0xbe, 0x02, 0x00, 0x00, 0x00,                    // +0x0000 mov     esi, 2
-		0x48, 0xc7, 0x45, 0xb0, 0x00, 0x00, 0x00, 0x00,  // +0x0005 mov     [rbp+var_50], 0
-		0x48, 0xc7, 0x45, 0xb8, 0x00, 0x00, 0x00, 0x00,  // +0x000d mov     [rbp+var_48], 0
-		0x48, 0xc7, 0x45, 0xc0, 0x00, 0x00, 0x00, 0x00,  // +0x0015 mov     [rbp+var_40], 0
-		0x48, 0xc7, 0x45, 0xc8, 0x00, 0x00, 0x00, 0x00,  // +0x001d mov     [rbp+var_38], 0
-		0x41, 0x01, 0xc7,                                // +0x0025 add     r15d, eax
-		0x48, 0x8d, 0x45, 0xb0,                          // +0x0028 lea     rax, [rbp+var_50]
-		0x48, 0x89, 0xc7,                                // +0x002c mov     rdi, rax
-		0x48, 0x89, 0x45, 0x98,                          // +0x002f mov     [rbp+var_68], rax
-		0xe8, 0xdc, 0xd0, 0xff, 0xff,                    // +0x0033 call    _Z14CollectPlayersI9CTFPlayerEiP10CUtlVectorIPT_10CUtlMemoryIS3_iEEibb_isra_0_12; CollectPlayers<CTFPlayer>(CUtlVector<CTFPlayer *,CUtlMemory<CTFPlayer *,int>> *,int,bool,bool) [clone]
-#else
 		0xba, 0x02, 0x00, 0x00, 0x00,              // +0x0000 mov     edx, 2
 		0xc7, 0x45, 0xd0, 0x00, 0x00, 0x00, 0x00,  // +0x0005 mov     dword ptr [ebp-30h], 0
 		0xc7, 0x45, 0xd4, 0x00, 0x00, 0x00, 0x00,  // +0x000c mov     dword ptr [ebp-2Ch], 0
@@ -623,22 +593,9 @@ namespace Mod::MvM::JoinTeam_Blue_Allow
 		0x89, 0x45, 0xc4,                          // +0x003d mov     [ebp-3Ch], eax
 		0x8d, 0x45, 0xd0,                          // +0x0040 lea     eax, [ebp-30h]
 		0xe8, 0x3a, 0xd1, 0xff, 0xff,              // +0x0043 call    _Z14CollectPlayersI9CTFPlayerEiP10CUtlVectorIPT_10CUtlMemoryIS3_iEEibb_isra_0_12; CollectPlayers<CTFPlayer>(CUtlVector<CTFPlayer *,CUtlMemory<CTFPlayer *,int>> *,int,bool,bool) [clone]
-#endif
 	};
 
 	constexpr uint8_t s_Mask_CPopulationManager_RestorePlayerCurrency[] = {
-#ifdef PLATFORM_64BITS
-		0xFF, 0xFF, 0xFF, 0xFF, 0xFF,                    // +0x0000 mov     esi, 2
-		0xFF, 0xFF, 0xFF, 0x00, 0xFF, 0xFF, 0xFF, 0xFF,  // +0x0005 mov     [rbp+var_50], 0
-		0xFF, 0xFF, 0xFF, 0x00, 0xFF, 0xFF, 0xFF, 0xFF,  // +0x000d mov     [rbp+var_48], 0
-		0xFF, 0xFF, 0xFF, 0x00, 0xFF, 0xFF, 0xFF, 0xFF,  // +0x0015 mov     [rbp+var_40], 0
-		0xFF, 0xFF, 0xFF, 0x00, 0xFF, 0xFF, 0xFF, 0xFF,  // +0x001d mov     [rbp+var_38], 0
-		0xFF, 0xFF, 0xFF,                                // +0x0025 add     r15d, eax
-		0xFF, 0xFF, 0xFF, 0x00,                          // +0x0028 lea     rax, [rbp+var_50]
-		0xFF, 0xFF, 0xFF,                                // +0x002c mov     rdi, rax
-		0xFF, 0xFF, 0xFF, 0x00,                          // +0x002f mov     [rbp+var_68], rax
-		0xFF, 0x00, 0x00, 0x00, 0x00,                    // +0x0033 call    _Z14CollectPlayersI9CTFPlayerEiP10CUtlVectorIPT_10CUtlMemoryIS3_iEEibb_isra_0_12; CollectPlayers<CTFPlayer>(CUtlVector<CTFPlayer *,CUtlMemory<CTFPlayer *,int>> *,int,bool,bool) [clone]
-#else
 		0xFF, 0xFF, 0xFF, 0xFF, 0xFF,              // +0x0000 mov     edx, 2
 		0xFF, 0xFF, 0x00, 0xFF, 0xFF, 0xFF, 0xFF,  // +0x0005 mov     dword ptr [ebp-30h], 0
 		0xFF, 0xFF, 0x00, 0xFF, 0xFF, 0xFF, 0xFF,  // +0x000c mov     dword ptr [ebp-2Ch], 0
@@ -652,26 +609,11 @@ namespace Mod::MvM::JoinTeam_Blue_Allow
 		0xFF, 0x00, 0x00,                          // +0x003d mov     [ebp-3Ch], eax
 		0xFF, 0x00, 0x00,                          // +0x0040 lea     eax, [ebp-30h]
 		0xFF, 0x00, 0x00, 0x00, 0x00,              // +0x0043 call    _Z14CollectPlayersI9CTFPlayerEiP10CUtlVectorIPT_10CUtlMemoryIS3_iEEibb_isra_0_12; CollectPlayers<CTFPlayer>(CUtlVector<CTFPlayer *,CUtlMemory<CTFPlayer *,int>> *,int,bool,bool) [clone]
-#endif
 	};
 
-#ifdef PLATFORM_64BITS
-	constexpr uintptr_t s_CallOff_CPopulationManager_RestorePlayerCurrency = 0x33;
-#else
 	constexpr uintptr_t s_CallOff_CPopulationManager_RestorePlayerCurrency = 0x43;
-#endif
 
 	constexpr uint8_t s_Buf_CollectPlayers_WaveCompleteUpdate[] = {
-#ifdef PLATFORM_64BITS
-		0x48, 0xc7, 0x85, 0x70, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00,  // +0x0000 mov     [rbp+var_90], 0
-		0xbe, 0x02, 0x00, 0x00, 0x00,                                      // +0x000b mov     esi, 2
-		0x48, 0x89, 0xc7,                                                  // +0x0010 mov     rdi, rax
-		0x48, 0xc7, 0x85, 0x78, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00,  // +0x0013 mov     [rbp+var_88], 0
-		0x48, 0xc7, 0x45, 0x80, 0x00, 0x00, 0x00, 0x00,                    // +0x001e mov     [rbp+var_80], 0
-		0x48, 0xc7, 0x45, 0x88, 0x00, 0x00, 0x00, 0x00,                    // +0x0026 mov     [rbp+var_78], 0
-		0x48, 0x89, 0x85, 0x68, 0xff, 0xff, 0xff,                          // +0x002e mov     [rbp+var_98], rax
-		0xe8, 0xc8, 0xde, 0xff, 0xff,                                      // +0x0035 call    _Z14CollectPlayersI9CTFPlayerEiP10CUtlVectorIPT_10CUtlMemoryIS3_iEEibb_isra_0_13; CollectPlayers<CTFPlayer>(CUtlVector<CTFPlayer *,CUtlMemory<CTFPlayer *,int>> *,int,bool,bool) [clone]
-#else
 		0xc7, 0x45, 0xb0, 0x00, 0x00, 0x00, 0x00,  // +0x0000 mov     dword ptr [ebp-50h], 0
 		0x6a, 0x00,                                // +0x0007 push    0
 		0xba, 0x02, 0x00, 0x00, 0x00,              // +0x0009 mov     edx, 2
@@ -680,20 +622,9 @@ namespace Mod::MvM::JoinTeam_Blue_Allow
 		0xc7, 0x45, 0xbc, 0x00, 0x00, 0x00, 0x00,  // +0x001c mov     dword ptr [ebp-44h], 0
 		0xc7, 0x45, 0xc0, 0x00, 0x00, 0x00, 0x00,  // +0x0023 mov     dword ptr [ebp-40h], 0
 		0xe8, 0xf6, 0xdf, 0xff, 0xff,              // +0x002a call    _Z14CollectPlayersI9CTFPlayerEiP10CUtlVectorIPT_10CUtlMemoryIS3_iEEibb_isra_0_13; CollectPlayers<CTFPlayer>(CUtlVector<CTFPlayer *,CUtlMemory<CTFPlayer *,int>> *,int,bool,bool) [clone]
-#endif
 	};
 
 	constexpr uint8_t s_Mask_CollectPlayers_WaveCompleteUpdate[] = {
-#ifdef PLATFORM_64BITS
-		0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF,  // +0x0000 mov     [rbp+var_90], 0
-		0xbe, 0x02, 0x00, 0x00, 0x00,                                      // +0x000b mov     esi, 2
-		0x48, 0x89, 0xc7,                                                  // +0x0010 mov     rdi, rax
-		0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF,  // +0x0013 mov     [rbp+var_88], 0
-		0xFF, 0xFF, 0xFF, 0x00, 0xFF, 0xFF, 0xFF, 0xFF,                    // +0x001e mov     [rbp+var_80], 0
-		0xFF, 0xFF, 0xFF, 0x00, 0xFF, 0xFF, 0xFF, 0xFF,                    // +0x0026 mov     [rbp+var_78], 0
-		0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00,                          // +0x002e mov     [rbp+var_98], rax
-		0xFF, 0x00, 0x00, 0x00, 0x00,                                      // +0x0035 call    _Z14CollectPlayersI9CTFPlayerEiP10CUtlVectorIPT_10CUtlMemoryIS3_iEEibb_isra_0_13; CollectPlayers<CTFPlayer>(CUtlVector<CTFPlayer *,CUtlMemory<CTFPlayer *,int>> *,int,bool,bool) [clone]
-#else
 		0xFF, 0xFF, 0x00, 0xFF, 0xFF, 0xFF, 0xFF,  // +0x0000 mov     dword ptr [ebp-50h], 0
 		0xFF, 0xFF,                                // +0x0007 push    0
 		0xFF, 0xFF, 0xFF, 0xFF, 0xFF,              // +0x0009 mov     edx, 2
@@ -702,52 +633,15 @@ namespace Mod::MvM::JoinTeam_Blue_Allow
 		0xFF, 0xFF, 0x00, 0xFF, 0xFF, 0xFF, 0xFF,  // +0x001c mov     dword ptr [ebp-44h], 0
 		0xFF, 0xFF, 0x00, 0xFF, 0xFF, 0xFF, 0xFF,  // +0x0023 mov     dword ptr [ebp-40h], 0
 		0xFF, 0x00, 0x00, 0x00, 0x00,              // +0x002a call    _Z14CollectPlayersI9CTFPlayerEiP10CUtlVectorIPT_10CUtlMemoryIS3_iEEibb_isra_0_13; CollectPlayers<CTFPlayer>(CUtlVector<CTFPlayer *,CUtlMemory<CTFPlayer *,int>> *,int,bool,bool) [clone]
-#endif
 	};
 
-#ifdef PLATFORM_64BITS
-	constexpr uintptr_t s_CallOff_CollectPlayers_WaveCompleteUpdate = 0x35;
-#else
 	constexpr uintptr_t s_CallOff_CollectPlayers_WaveCompleteUpdate = 0x2a;
-#endif
-
-#ifdef PLATFORM_64BITS
-constexpr uint8_t s_Buf_CollectPlayers_RadiusSpyScan[] = {
-		0x48, 0xc7, 0x45, 0xb0, 0x00, 0x00, 0x00, 0x00,  // +0x0000 mov     [rbp+var_50], 0
-		0xbe, 0x03, 0x00, 0x00, 0x00,                    // +0x0008 mov     esi, 3
-		0x48, 0x89, 0xc7,                                // +0x000d mov     rdi, rax
-		0x48, 0xc7, 0x45, 0xb8, 0x00, 0x00, 0x00, 0x00,  // +0x0010 mov     [rbp+var_48], 0
-		0x48, 0xc7, 0x45, 0xc0, 0x00, 0x00, 0x00, 0x00,  // +0x0018 mov     [rbp+var_40], 0
-		0x48, 0xc7, 0x45, 0xc8, 0x00, 0x00, 0x00, 0x00,  // +0x0020 mov     [rbp+var_38], 0
-		0x48, 0x89, 0x45, 0xa8,                          // +0x0028 mov     [rbp+var_58], rax
-		0xe8, 0xa4, 0x8c, 0xfe, 0xff,                    // +0x002c call    _Z14CollectPlayersI9CTFPlayerEiP10CUtlVectorIPT_10CUtlMemoryIS3_iEEibb_isra_0_1; CollectPlayers<CTFPlayer>(CUtlVector<CTFPlayer *,CUtlMemory<CTFPlayer *,int>> *,int,bool,bool) [clone]
-};
-
-constexpr uint8_t s_Mask_CollectPlayers_RadiusSpyScan[] = {
-		0xFF, 0xFF, 0xFF, 0x00, 0xFF, 0xFF, 0xFF, 0xFF,  // +0x0000 mov     [rbp+var_50], 0
-		0xFF, 0xFF, 0xFF, 0xFF, 0xFF,                    // +0x0008 mov     esi, 3
-		0xFF, 0xFF, 0xFF,                                // +0x000d mov     rdi, rax
-		0xFF, 0xFF, 0xFF, 0x00, 0xFF, 0xFF, 0xFF, 0xFF,  // +0x0010 mov     [rbp+var_48], 0
-		0xFF, 0xFF, 0xFF, 0x00, 0xFF, 0xFF, 0xFF, 0xFF,  // +0x0018 mov     [rbp+var_40], 0
-		0xFF, 0xFF, 0xFF, 0x00, 0xFF, 0xFF, 0xFF, 0xFF,  // +0x0020 mov     [rbp+var_38], 0
-		0xFF, 0xFF, 0xFF, 0x00,                          // +0x0028 mov     [rbp+var_58], rax
-		0xFF, 0x00, 0x00, 0x00, 0x00,                    // +0x002c call    _Z14CollectPlayersI9CTFPlayerEiP10CUtlVectorIPT_10CUtlMemoryIS3_iEEibb_isra_0_1; CollectPlayers<CTFPlayer>(CUtlVector<CTFPlayer *,CUtlMemory<CTFPlayer *,int>> *,int,bool,bool) [clone]
-};
-
-constexpr uintptr_t s_CallOff_CollectPlayers_RadiusSpyScan = 0x2c;
-#endif
 	
 	constexpr uint8_t s_Buf_RadiusSpyScan[] = {
-#ifdef PLATFORM_64BITS
-		0x48, 0x8b, 0xbf, 0xc0, 0x01, 0x00, 0x00,  // +0x0000 mov     rdi, [rdi+1C0h]; this
-		0xe8, 0x00, 0xbe, 0x20, 0x00,              // +0x0007 call    _ZNK11CBaseEntity13GetTeamNumberEv; CBaseEntity::GetTeamNumber(void)
-		0x83, 0xf8, 0x02,                          // +0x000c cmp     eax, 2
-#else
 		0xff, 0xb7, 0x8c, 0x01, 0x00, 0x00,  // +0x0000 push    dword ptr [edi+18Ch]
 		0xe8, 0x49, 0xf5, 0x1f, 0x00,        // +0x0006 call    _ZNK11CBaseEntity13GetTeamNumberEv; CBaseEntity::GetTeamNumber(void)
 		0x83, 0xc4, 0x10,                    // +0x000b add     esp, 10h
 		0x83, 0xf8, 0x02,                    // +0x000e cmp     eax, 2
-#endif
 	};
 	
 	struct CPatch_RadiusSpyScan : public CPatch
@@ -756,7 +650,7 @@ constexpr uintptr_t s_CallOff_CollectPlayers_RadiusSpyScan = 0x2c;
 		
 		virtual const char *GetFuncName() const override { return "CTFPlayerShared::RadiusSpyScan"; }
 		virtual uint32_t GetFuncOffMin() const override  { return 0x0000; }
-		virtual uint32_t GetFuncOffMax() const override  { return 0x0030; } // @ +0x000c
+		virtual uint32_t GetFuncOffMax() const override  { return 0x0020; } // @ +0x000c
 		
 		virtual bool GetVerifyInfo(ByteBuf& buf, ByteBuf& mask) const override
 		{
@@ -764,37 +658,22 @@ constexpr uintptr_t s_CallOff_CollectPlayers_RadiusSpyScan = 0x2c;
 			
 			int off_CTFPlayerShared_m_pOuter;
 			if (!Prop::FindOffset(off_CTFPlayerShared_m_pOuter, "CTFPlayerShared", "m_pOuter")) return false;
-#ifdef PLATFORM_64BITS
-			buf.SetDword(0x00 + 3, off_CTFPlayerShared_m_pOuter);
-			
-			mask.SetDword(0x07 + 1, 0x00000000);
-#else
 			buf.SetDword(0x00 + 2, off_CTFPlayerShared_m_pOuter);
 			
 			mask.SetDword(0x06 + 1, 0x00000000);
 			mask[0x0b + 2] = 0x00;
-#endif
 			
 			return true;
 		}
 		
 		virtual bool GetPatchInfo(ByteBuf& buf, ByteBuf& mask) const override
 		{
-#ifdef PLATFORM_64BITS
-			/* replace 'cmp eax,TF_TEAM_RED' with 'cmp eax,eax; nop' */
-			buf[0x0c + 0] = 0x39;
-			buf[0x0c + 1] = 0xc0;
-			buf[0x0c + 2] = 0x90;
-			
-			mask.SetRange(0x0c, 3, 0xff);
-#else
 			/* replace 'cmp eax,TF_TEAM_RED' with 'cmp eax,eax; nop' */
 			buf[0x0e + 0] = 0x39;
 			buf[0x0e + 1] = 0xc0;
 			buf[0x0e + 2] = 0x90;
 			
 			mask.SetRange(0x0e, 3, 0xff);
-#endif
 			
 			return true;
 		}
@@ -928,7 +807,7 @@ constexpr uintptr_t s_CallOff_CollectPlayers_RadiusSpyScan = 0x2c;
 	{
 		/* it's important to let the call happen, because pPlayer->m_nCurrency
 		 * is set to its proper value in the call (stupid, but whatever) */
-		auto iResult = DETOUR_MEMBER_CALL(pPlayer, iWantedTeam, b1);
+		auto iResult = DETOUR_MEMBER_CALL(CTFGameRules_GetTeamAssignmentOverride)(pPlayer, iWantedTeam, b1);
 		
 		// debug message for the "sometimes bots don't get put on TEAM_SPECTATOR properly at wave end" situation
 		if (TFGameRules()->IsMannVsMachineMode() && pPlayer->IsBot() && iResult != iWantedTeam) {
@@ -974,14 +853,14 @@ constexpr uintptr_t s_CallOff_CollectPlayers_RadiusSpyScan = 0x2c;
 			return nullptr;
 		}
 		
-		return DETOUR_STATIC_CALL(player);
+		return DETOUR_STATIC_CALL(CTFReviveMarker_Create)(player);
 	}
 	
 	DETOUR_DECL_MEMBER(void, CTFPlayer_OnNavAreaChanged, CNavArea *enteredArea, CNavArea *leftArea)
 	{
 		auto player = reinterpret_cast<CTFPlayer *>(this);
 		
-		DETOUR_MEMBER_CALL(enteredArea, leftArea);
+		DETOUR_MEMBER_CALL(CTFPlayer_OnNavAreaChanged)(enteredArea, leftArea);
 		
 		if (IsMvMBlueHuman(player) &&
 			(enteredArea == nullptr ||  static_cast<CTFNavArea *>(enteredArea)->HasTFAttributes(BLUE_SPAWN_ROOM)) &&
@@ -999,7 +878,7 @@ constexpr uintptr_t s_CallOff_CollectPlayers_RadiusSpyScan = 0x2c;
 			}
 		}
 		
-		DETOUR_MEMBER_CALL(pEntity, pKeyValues);
+		DETOUR_MEMBER_CALL(CTFGameRules_ClientCommandKeyValues)(pEntity, pKeyValues);
 	}
 	
 	
@@ -1011,7 +890,7 @@ constexpr uintptr_t s_CallOff_CollectPlayers_RadiusSpyScan = 0x2c;
 			return false;
 		}
 		
-		return DETOUR_MEMBER_CALL();
+		return DETOUR_MEMBER_CALL(CTFPlayer_IsAllowedToPickUpFlag)();
 	}
 	
 	DETOUR_DECL_MEMBER(void, CCaptureZone_ShimTouch, CBaseEntity *pOther)
@@ -1064,13 +943,13 @@ constexpr uintptr_t s_CallOff_CollectPlayers_RadiusSpyScan = 0x2c;
 			//player->m_Shared->StunPlayer(1.0f, 1.0f, TF_STUNFLAGS_CONTROL | TF_STUNFLAGS_CONTROL, nullptr);
 		}();
 		
-		DETOUR_MEMBER_CALL(pOther);
+		DETOUR_MEMBER_CALL(CCaptureZone_ShimTouch)(pOther);
 	}
 	
 	
 //	DETOUR_DECL_MEMBER(void, CPlayerMove_StartCommand, CBasePlayer *player, CUserCmd *ucmd)
 //	{
-//		DETOUR_MEMBER_CALL(player, ucmd);
+//		DETOUR_MEMBER_CALL(CPlayerMove_StartCommand)(player, ucmd);
 //		
 //		DevMsg("CPlayerMove::StartCommand(#%d): buttons = %08x\n", ENTINDEX(player), ucmd->buttons);
 //		
@@ -1089,7 +968,7 @@ constexpr uintptr_t s_CallOff_CollectPlayers_RadiusSpyScan = 0x2c;
 	{
 		SCOPED_INCREMENT_IF(rc_CTFGameRules_FireGameEvent__teamplay_round_start,
 			(event != nullptr && strcmp(event->GetName(), "teamplay_round_start") == 0));
-		DETOUR_MEMBER_CALL(event);
+		DETOUR_MEMBER_CALL(CTFGameRules_FireGameEvent)(event);
 	}
 	
 	DETOUR_DECL_STATIC(int, CollectPlayers_CTFPlayer, CUtlVector<CTFPlayer *> *playerVector, int team, bool isAlive, bool shouldAppend)
@@ -1099,7 +978,7 @@ constexpr uintptr_t s_CallOff_CollectPlayers_RadiusSpyScan = 0x2c;
 			return CollectPlayers_RedAndBlue_IsBot(playerVector, team, isAlive, shouldAppend);
 		}
 		
-		return DETOUR_STATIC_CALL(playerVector, team, isAlive, shouldAppend);
+		return DETOUR_STATIC_CALL(CollectPlayers_CTFPlayer)(playerVector, team, isAlive, shouldAppend);
 	}
 	
 	
@@ -1117,7 +996,7 @@ constexpr uintptr_t s_CallOff_CollectPlayers_RadiusSpyScan = 0x2c;
 		SCOPED_INCREMENT(rc_CTFPlayerShared_RadiusSpyScan);
 		radius_spy_scan_teamnum = player->GetTeamNumber();
 		
-		DETOUR_MEMBER_CALL();
+		DETOUR_MEMBER_CALL(CTFPlayerShared_RadiusSpyScan)();
 	}
 	
 	__gcc_regcall static int CollectPlayers_RadiusSpyScan(CUtlVector<CTFPlayer *> *playerVector, int team, bool isAlive, bool shouldAppend)
@@ -1135,7 +1014,7 @@ constexpr uintptr_t s_CallOff_CollectPlayers_RadiusSpyScan = 0x2c;
 	{
 		auto bot = reinterpret_cast<CTFBot *>(this);
 		
-		DETOUR_MEMBER_CALL();
+		DETOUR_MEMBER_CALL(CTFBot_Spawn)();
 		
 		if (TFGameRules()->IsMannVsMachineMode()) {
 			// ========= MANN VS MACHINE MODE ROUND STATE TRANSITIONS ==========
@@ -1184,7 +1063,7 @@ constexpr uintptr_t s_CallOff_CollectPlayers_RadiusSpyScan = 0x2c;
 	
 	DETOUR_DECL_MEMBER(bool, CTFGameRules_PlayerReadyStatus_ShouldStartCountdown)
 	{
-		bool ret = DETOUR_MEMBER_CALL();
+		bool ret = DETOUR_MEMBER_CALL(CTFGameRules_PlayerReadyStatus_ShouldStartCountdown)();
 		if (TFGameRules()->IsMannVsMachineMode()) {
 			bool notReadyPlayerBlue = false;
 			bool notReadyPlayerRed = false;
@@ -1211,7 +1090,7 @@ constexpr uintptr_t s_CallOff_CollectPlayers_RadiusSpyScan = 0x2c;
 
 	DETOUR_DECL_MEMBER(int, CTFBaseBoss_OnTakeDamage, CTakeDamageInfo &info)
 	{
-		float damage = DETOUR_MEMBER_CALL(info);
+		float damage = DETOUR_MEMBER_CALL(CTFBaseBoss_OnTakeDamage)(info);
 		if (info.GetAttacker() != nullptr && info.GetAttacker()->GetTeamNumber() == reinterpret_cast<CBaseEntity *>(this)->GetTeamNumber())
 			return 0;
 		return damage;
@@ -1230,7 +1109,7 @@ constexpr uintptr_t s_CallOff_CollectPlayers_RadiusSpyScan = 0x2c;
 				}
 			}
 		}
-		return DETOUR_MEMBER_CALL(ent);
+		return DETOUR_MEMBER_CALL(CTFBotVision_IsIgnored)(ent);
 	}
 
 	DETOUR_DECL_MEMBER(void, CTFPlayer_RemoveAmmo, int count, const char *name)
@@ -1240,7 +1119,7 @@ constexpr uintptr_t s_CallOff_CollectPlayers_RadiusSpyScan = 0x2c;
 
 		if (change)
 			player->SetTeamNumber(TF_TEAM_RED);
-		DETOUR_MEMBER_CALL(count, name);
+		DETOUR_MEMBER_CALL(CTFPlayer_RemoveAmmo)(count, name);
 
 		if (change)
 			player->SetTeamNumber(TF_TEAM_BLUE);
@@ -1259,7 +1138,7 @@ constexpr uintptr_t s_CallOff_CollectPlayers_RadiusSpyScan = 0x2c;
 		sentryRocketAmmoCurrent = obj->m_iAmmoRockets;
 		bool stopammo = TFGameRules()->IsMannVsMachineMode() && !cvar_infinite_ammo.GetBool() && IsMvMBlueHuman(owner);
 
-		DETOUR_MEMBER_CALL();
+		DETOUR_MEMBER_CALL(CObjectSentrygun_SentryThink)();
 
 		if (stopammo) {
 			obj->m_iMaxAmmoShells = maxAmmo;
@@ -1273,7 +1152,7 @@ constexpr uintptr_t s_CallOff_CollectPlayers_RadiusSpyScan = 0x2c;
 	{
 		auto obj = reinterpret_cast<CObjectSentrygun *>(this);
 
-		DETOUR_MEMBER_CALL();
+		DETOUR_MEMBER_CALL(CObjectSentrygun_Attack)();
 		sentryAmmoCurrent = obj->m_iAmmoShells;
 		sentryRocketAmmoCurrent = obj->m_iAmmoRockets;
 	}
@@ -1287,7 +1166,7 @@ constexpr uintptr_t s_CallOff_CollectPlayers_RadiusSpyScan = 0x2c;
 		if (changedteam)
 			obj->SetTeamNumber(TF_TEAM_RED);
 
-		bool ret = DETOUR_MEMBER_CALL();
+		bool ret = DETOUR_MEMBER_CALL(CBaseObject_ShouldQuickBuild)();
 
 		if (changedteam)
 			obj->SetTeamNumber(TF_TEAM_BLUE);
@@ -1304,7 +1183,7 @@ constexpr uintptr_t s_CallOff_CollectPlayers_RadiusSpyScan = 0x2c;
 		if (changedteam)
 			obj->SetTeamNumber(TF_TEAM_RED);
 
-		DETOUR_MEMBER_CALL();
+		DETOUR_MEMBER_CALL(CObjectTeleporter_DeterminePlaybackRate)();
 		if (obj->m_iState == 1) {
 			StopParticleEffects(obj);
 		}
@@ -1315,14 +1194,14 @@ constexpr uintptr_t s_CallOff_CollectPlayers_RadiusSpyScan = 0x2c;
 	
 	DETOUR_DECL_MEMBER(bool, CTFGameRules_ShouldRespawnQuickly, CTFPlayer *player)
 	{
-		bool ret = DETOUR_MEMBER_CALL(player);
+		bool ret = DETOUR_MEMBER_CALL(CTFGameRules_ShouldRespawnQuickly)(player);
 		ret |= TFGameRules()->IsMannVsMachineMode() && player->GetPlayerClass()->GetClassIndex() == TF_CLASS_SCOUT && !player->IsBot();
 		return ret;
 	}
 
 	DETOUR_DECL_MEMBER_CALL_CONVENTION(__gcc_regcall, bool, CTFKnife_CanPerformBackstabAgainstTarget, CTFPlayer *target )
 	{
-		bool ret = DETOUR_MEMBER_CALL(target);
+		bool ret = DETOUR_MEMBER_CALL(CTFKnife_CanPerformBackstabAgainstTarget)(target);
 
 		if ( !ret && TFGameRules() && TFGameRules()->IsMannVsMachineMode() && target->GetTeamNumber() == TF_TEAM_RED )
 		{
@@ -1388,7 +1267,7 @@ constexpr uintptr_t s_CallOff_CollectPlayers_RadiusSpyScan = 0x2c;
 
 	DETOUR_DECL_MEMBER(void, CTFGameRules_OnPlayerSpawned, CTFPlayer *player)
 	{
-		DETOUR_MEMBER_CALL(player);
+		DETOUR_MEMBER_CALL(CTFGameRules_OnPlayerSpawned)(player);
 		bool bluhuman = IsMvMBlueHuman(player);
 		CTFPlayer *playerbot = ToTFBot(player);
 		if ((bluhuman && cvar_teleport.GetBool()) || cvar_teleport_player.GetBool()) {
@@ -1405,7 +1284,7 @@ constexpr uintptr_t s_CallOff_CollectPlayers_RadiusSpyScan = 0x2c;
 
 	DETOUR_DECL_MEMBER(void, CTFPlayer_Touch, CBaseEntity *toucher)
 	{
-		DETOUR_MEMBER_CALL(toucher);
+		DETOUR_MEMBER_CALL(CTFPlayer_Touch)(toucher);
 		auto player = reinterpret_cast<CTFPlayer *>(this);
 		if (player->IsMiniBoss() && toucher->IsBaseObject()) {
 			CBaseObject *obj = ToBaseObject(toucher);
@@ -1436,7 +1315,7 @@ constexpr uintptr_t s_CallOff_CollectPlayers_RadiusSpyScan = 0x2c;
 				}
 			});
 		}
-		DETOUR_STATIC_CALL(clientCount, clients, snapshot);
+		DETOUR_STATIC_CALL(SV_ComputeClientPacks)(clientCount, clients, snapshot);
 		
 		if (cvar_no_footsteps.GetBool()) {
 			ForEachTFPlayer([&](CTFPlayer *player) {
@@ -1457,12 +1336,12 @@ constexpr uintptr_t s_CallOff_CollectPlayers_RadiusSpyScan = 0x2c;
 		if (IsMvMBlueHuman(reinterpret_cast<CTFSniperRifle *>(this)->GetTFPlayerOwner())) {
 			return;
 		}
-		DETOUR_MEMBER_CALL();
+		DETOUR_MEMBER_CALL(CTFSniperRifle_CreateSniperDot)();
 	}
 	
 	DETOUR_DECL_STATIC(CBaseEntity *, CSniperDot_Create, Vector &origin, CBaseEntity *owner, bool visibleDot)
 	{
-		return laser_dot = DETOUR_STATIC_CALL(origin, owner, visibleDot);
+		return laser_dot = DETOUR_STATIC_CALL(CSniperDot_Create)(origin, owner, visibleDot);
 	}
 
 	DETOUR_DECL_MEMBER(void, CTFPlayer_RemoveAllOwnedEntitiesFromWorld, bool explode)
@@ -1472,7 +1351,7 @@ constexpr uintptr_t s_CallOff_CollectPlayers_RadiusSpyScan = 0x2c;
 		if (blueHuman) {
 			TFGameRules()->Set_m_bPlayingMannVsMachine(false);
 		}
-		DETOUR_MEMBER_CALL(explode);
+		DETOUR_MEMBER_CALL(CTFPlayer_RemoveAllOwnedEntitiesFromWorld)(explode);
 		if (blueHuman) {
 			TFGameRules()->Set_m_bPlayingMannVsMachine(true);
 		}
@@ -1550,14 +1429,14 @@ constexpr uintptr_t s_CallOff_CollectPlayers_RadiusSpyScan = 0x2c;
 			event->SetInt("winning_team", teamnum == TF_TEAM_RED ? TF_TEAM_BLUE : TF_TEAM_RED);
 		}
 		
-		return DETOUR_MEMBER_CALL(event, bDontBroadcast);
+		return DETOUR_MEMBER_CALL(IGameEventManager2_FireEvent)(event, bDontBroadcast);
 	}
 
 	RefCount rc_CTFBot_Event_Killed;
 	DETOUR_DECL_MEMBER(void, CTFBot_Event_Killed, const CTakeDamageInfo& info)
 	{
 		auto bot = reinterpret_cast<CTFBot *>(this);
-		DETOUR_MEMBER_CALL(info);
+		DETOUR_MEMBER_CALL(CTFBot_Event_Killed)(info);
 		
 		extern ConVar cvar_force;
 		if (cvar_force.GetBool() && bot->GetTeamNumber() == TF_TEAM_RED) {
@@ -1637,7 +1516,7 @@ constexpr uintptr_t s_CallOff_CollectPlayers_RadiusSpyScan = 0x2c;
 			TFGameRules()->Set_m_bPlayingMannVsMachine(false);
 		}
 		
-		bool ret = DETOUR_MEMBER_CALL();
+		bool ret = DETOUR_MEMBER_CALL(CVoteController_IsValidVoter)();
 
 		if (blueHuman) {
 			TFGameRules()->Set_m_bPlayingMannVsMachine(true);
@@ -1652,14 +1531,14 @@ constexpr uintptr_t s_CallOff_CollectPlayers_RadiusSpyScan = 0x2c;
 	//	DevMsg("CTFGameRules::PlayerKilled\n");
 		killed = IsMvMBlueHuman(ToTFPlayer(info.GetAttacker())) && pVictim->GetTeamNumber() == TF_TEAM_RED ? pVictim : nullptr;
 		team_change_back = false;
-		DETOUR_MEMBER_CALL(pVictim, info);
+		DETOUR_MEMBER_CALL(CTFGameRules_PlayerKilled)(pVictim, info);
 	}
 
 	DETOUR_DECL_MEMBER(void, CTeamplayRules_PlayerKilled, CBasePlayer *pVictim, const CTakeDamageInfo& info)
 	{
 		if (killed != nullptr && team_change_back) 
 			killed->SetTeamNumber(TF_TEAM_RED);
-		DETOUR_MEMBER_CALL(pVictim, info);
+		DETOUR_MEMBER_CALL(CTeamplayRules_PlayerKilled)(pVictim, info);
 		killed = nullptr;
 	}
 	
@@ -1671,7 +1550,7 @@ constexpr uintptr_t s_CallOff_CollectPlayers_RadiusSpyScan = 0x2c;
 			team_change_back = true;
 		}
 
-        return DETOUR_STATIC_CALL(info);
+        return DETOUR_STATIC_CALL(GetKilleaterWeaponFromDamageInfo)(info);
     }
 
 	DETOUR_DECL_MEMBER(void, CMultiplayRules_HaveAllPlayersSpeakConceptIfAllowed, int iConcept, int iTeam /* = TEAM_UNASSIGNED */, const char *modifiers)
@@ -1679,7 +1558,7 @@ constexpr uintptr_t s_CallOff_CollectPlayers_RadiusSpyScan = 0x2c;
 		if (iConcept == TF_TEAM_RED) {
 			iTeam = TF_TEAM_BLUE;
 		}
-		DETOUR_MEMBER_CALL(iConcept, iTeam, modifiers);
+		DETOUR_MEMBER_CALL(CMultiplayRules_HaveAllPlayersSpeakConceptIfAllowed)(iConcept, iTeam, modifiers);
 	}
 	
 	void CallbackScoreboard(CBaseEntity *entity, int clientIndex, DVariant &value, int callbackIndex, SendProp *prop, uintptr_t data) {
@@ -1783,11 +1662,8 @@ constexpr uintptr_t s_CallOff_CollectPlayers_RadiusSpyScan = 0x2c;
 			/* fix hardcoded teamnum checks in the radius spy scan ability */
 			MOD_ADD_DETOUR_MEMBER(CTFPlayerShared_RadiusSpyScan, "CTFPlayerShared::RadiusSpyScan");
 			this->AddPatch(new CPatch_CollectPlayers_Caller_Regcall<0x0000, 0x0100, TF_TEAM_BLUE, true, false, CollectPlayers_RadiusSpyScan>("CTFPlayerShared::RadiusSpyScan",
-#ifdef PLATFORM_64BITS
-				sizeof(s_Buf_CollectPlayers_RadiusSpyScan), s_Buf_CollectPlayers_RadiusSpyScan, s_Mask_CollectPlayers_RadiusSpyScan, s_CallOff_CollectPlayers_RadiusSpyScan));
-#else
 				sizeof(s_Buf_CollectPlayers_Common_Regcall), s_Buf_CollectPlayers_Common_Regcall, s_Mask_CollectPlayers_Common_Regcall, s_CallOff_CollectPlayers_Common_Regcall));
-#endif			
+			
 			this->AddPatch(new CPatch_RadiusSpyScan());
 			
 			/* this is purely for debugging the blue-robots-spawning-between-waves situation */

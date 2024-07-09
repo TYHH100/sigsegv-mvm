@@ -17,17 +17,6 @@
 namespace Mod::Cond::Reprogrammed
 {
 	constexpr uint8_t s_Buf_UpdateMission[] = {
-#ifdef PLATFORM_64BITS
-		0xba, 0x01, 0x00, 0x00, 0x00,                    // +0x0000 mov     edx, 1
-		0x48, 0xc7, 0x45, 0x90, 0x00, 0x00, 0x00, 0x00,  // +0x0005 mov     [rbp+var_70], 0
-		0xbe, 0x03, 0x00, 0x00, 0x00,                    // +0x000d mov     esi, 3
-		0x48, 0x89, 0xc7,                                // +0x0012 mov     rdi, rax
-		0x48, 0xc7, 0x45, 0x98, 0x00, 0x00, 0x00, 0x00,  // +0x0015 mov     [rbp+var_68], 0
-		0x48, 0xc7, 0x45, 0xa0, 0x00, 0x00, 0x00, 0x00,  // +0x001d mov     [rbp+var_60], 0
-		0x48, 0xc7, 0x45, 0xa8, 0x00, 0x00, 0x00, 0x00,  // +0x0025 mov     [rbp+var_58], 0
-		0x48, 0x89, 0x85, 0x58, 0xff, 0xff, 0xff,        // +0x002d mov     [rbp+var_A8], rax
-		0xe8,                                            // +0x0034 call    _Z14CollectPlayersI9CTFPlayerEiP10CUtlVectorIPT_10CUtlMemoryIS3_iEEibb_isra_0_13; CollectPlayers<CTFPlayer>(CUtlVector<CTFPlayer *,CUtlMemory<CTFPlayer *,int>> *,int,bool,bool) [clone]
-#else
 		0xB9, 0x01, 0x00, 0x00, 0x00,                   // +0000  mov     ecx, 1
 		0xBA, 0x03, 0x00, 0x00, 0x00,                   // +0005  mov     edx, 3
 		0xC7, 0x45, 0xB8, 0x00, 0x00, 0x00, 0x00,       // +000A  mov     dword ptr [ebp-48h], 0
@@ -38,7 +27,6 @@ namespace Mod::Cond::Reprogrammed
 		0xc7, 0x45, 0xb4, 0x00, 0x00, 0x00, 0x00,       // +0024  mov [ebp-0x4c],0x00000000
 		0xc7, 0x45, 0xb8, 0x00, 0x00, 0x00, 0x00,       // +002b  mov [ebp-0x48],0x00000000
 		0xe8,                                           // +0032  call CollectPlayers<CTFPlayer>
-#endif
 	};
 	
 	struct CPatch_CMissionPopulator_UpdateMission : public CPatch
@@ -52,20 +40,13 @@ namespace Mod::Cond::Reprogrammed
 		virtual bool GetVerifyInfo(ByteBuf& buf, ByteBuf& mask) const override
 		{
 			buf.CopyFrom(s_Buf_UpdateMission);
-#ifdef PLATFORM_64BITS
-			mask.SetRange(0x05 + 3, 1, 0x00);
-			mask.SetRange(0x15 + 3, 1, 0x00);
-			mask.SetRange(0x1d + 3, 1, 0x00);
-			mask.SetRange(0x25 + 3, 1, 0x00);
-			mask.SetRange(0x2d + 3, 4, 0x00);
-#else
+			
 			mask.SetRange(0x0a + 2, 5, 0x00);
 			mask.SetRange(0x13 + 2, 1, 0x00);
 			mask.SetRange(0x16 + 2, 1, 0x00);
 			mask.SetRange(0x1d + 2, 1, 0x00);
 			mask.SetRange(0x24 + 2, 1, 0x00);
 			mask.SetRange(0x2b + 2, 1, 0x00);
-#endif
 			
 			return true;
 		}
@@ -73,13 +54,9 @@ namespace Mod::Cond::Reprogrammed
 		virtual bool GetPatchInfo(ByteBuf& buf, ByteBuf& mask) const override
 		{
 			/* change the teamnum to TEAM_ANY */
-#ifdef PLATFORM_64BITS
-			buf .SetDword(0x0d + 1, TEAM_ANY);
-			mask.SetDword(0x0d + 1, 0xffffffff);
-#else
 			buf .SetDword(0x05 + 1, TEAM_ANY);
 			mask.SetDword(0x05 + 1, 0xffffffff);
-#endif
+			
 			return true;
 		}
 	};
@@ -95,17 +72,11 @@ namespace Mod::Cond::Reprogrammed
 	
 	
 	constexpr uint8_t s_Buf_CheckStuck[] = {
-#ifdef PLATFORM_64BITS
-		0xe8, 0x85, 0x61, 0x2a, 0x00,        // +0x0000 call    _ZNK11CBaseEntity13GetTeamNumberEv; CBaseEntity::GetTeamNumber(void)
-		0x83, 0xf8, 0x03,                    // +0x0005 cmp     eax, TF_TEAM_PVE_INVADERS
-		0x0f, 0x84, 0x4c, 0x02, 0x00, 0x00,  // +0x0008 jz      loc_AAD7D0
-#else
 		0x50,                               // +0000  push eax
 		0xe8, 0x1e, 0x1d, 0x28, 0x00,       // +0001  call CBaseEntity::GetTeamNumber
 		0x83, 0xC4, 0x10,                   // +0006  add esp, 10h
 		0x83, 0xf8, 0x03,                   // +0009  cmp eax,TF_TEAM_PVE_INVADERS
 		0x0f, 0x84, 0xa5, 0x01, 0x00, 0x00, // +000C  jz +0x1a5
-#endif
 	};
 //	constexpr uint8_t s_Buf_CheckStuck_after[] = {
 //		0x50,                               // +0000  push eax
@@ -127,30 +98,16 @@ namespace Mod::Cond::Reprogrammed
 		virtual bool GetVerifyInfo(ByteBuf& buf, ByteBuf& mask) const override
 		{
 			buf.CopyFrom(s_Buf_CheckStuck);
-
-#ifdef PLATFORM_64BITS
-			mask.SetRange(0x01 + 1, 4, 0x00);
-			mask.SetRange(0x08 + 2, 4, 0x00);
-#else
+			
 			mask.SetRange(0x01 + 1, 4, 0x00);
 			mask.SetRange(0x06 + 2, 1, 0x00);
 			mask.SetRange(0x0c + 2, 4, 0x00);
-#endif
 			
 			return true;
 		}
 		
 		virtual bool GetPatchInfo(ByteBuf& buf, ByteBuf& mask) const override
 		{
-#ifdef PLATFORM_64BITS
-			/* test result */
-			buf[0x05] = 0x90;
-			buf[0x06] = 0x84;
-			buf[0x07] = 0xc0;
-
-			/* invert the jump condition code */
-			buf[0x09] = 0x85;
-#else
 			// Move add esp
 			buf[0x09] = buf[0x08];
 			buf[0x08] = buf[0x07];
@@ -170,35 +127,20 @@ namespace Mod::Cond::Reprogrammed
 			
 			mask.SetRange(0x01, 0x0b, 0xff);
 			mask[0x0d] = 0xff;
-#endif
 			
 			return true;
 		}
 		
-		virtual bool AdjustPatchInfo(ByteBuf& buf) const override
-		{
-#ifdef PLATFORM_64BITS
-			buf.SetDword(0x00 + 1, AddrManager::GetAddrOffset("CBasePlayer::IsBot", GetFuncName(), 0x05 + this->GetActualOffset()));
-#endif
-			return true;
-		}
 		static FPtr_IsBot s_CBasePlayer_IsBot;
 	};
 	FPtr_IsBot CPatch_CTFGameMovement_CheckStuck::s_CBasePlayer_IsBot = &CBasePlayer::IsBot;
 	
 	
 	constexpr uint8_t s_Buf_CTFPistol_ScoutPrimary_Push[] = {
-#ifdef PLATFORM_64BITS
-		0x83, 0xbb, 0xac, 0x10, 0x00, 0x00, 0x02,  // +0x0000 cmp     dword ptr [rbx+10ACh], 2
-		0x0f, 0x84, 0x7d, 0x00, 0x00, 0x00,        // +0x0007 jz      loc_BF8EE0
-		0x41, 0x83, 0xff, 0xfe,                    // +0x000d cmp     r15d, 0FFFFFFFEh
-		0x74, 0x0d,                                // +0x0011 jz      short loc_BF8E76
-#else
 		0x83, 0xbb, 0x8c, 0x0e, 0x00, 0x00, 0x02,  // +0x0000 cmp     dword ptr [ebx+0E8Ch], 2
 		0x74, 0x70,                                // +0x0007 jz      short loc_971E40
 		0x83, 0xbd, 0xb4, 0xfe, 0xff, 0xff, 0xfe,  // +0x0009 cmp     [ebp+var_14C], 0FFFFFFFEh
 		0x74, 0x14,                                // +0x0010 jz      short loc_971DED
-#endif
 	};
 	
 	struct CPatch_CTFPistol_ScoutPrimary_Push : public CPatch
@@ -213,16 +155,10 @@ namespace Mod::Cond::Reprogrammed
 		{
 			buf.CopyFrom(s_Buf_CTFPistol_ScoutPrimary_Push);
 			
-#ifdef PLATFORM_64BITS
-			mask.SetRange(0x00 + 2, 4, 0x00);
-			mask.SetRange(0x07 + 2, 4, 0x00);
-			mask.SetRange(0x11 + 1, 1, 0x00);
-#else
 			mask.SetRange(0x00 + 2, 4, 0x00);
 			mask.SetRange(0x07 + 1, 1, 0x00);
 			mask.SetRange(0x09 + 2, 1, 0x00);
 			mask.SetRange(0x10 + 1, 1, 0x00);
-#endif
 			
 			return true;
 		}
@@ -230,13 +166,8 @@ namespace Mod::Cond::Reprogrammed
 		virtual bool GetPatchInfo(ByteBuf& buf, ByteBuf& mask) const override
 		{
 			// Change jz to jnz (always jump)
-#ifdef PLATFORM_64BITS
-			buf[0x11] = 0x75;
-			mask[0x11] = 0xff;
-#else
 			buf[0x10] = 0x75;
 			mask[0x10] = 0xff;
-#endif
 			
 			return true;
 		}
@@ -600,7 +531,7 @@ namespace Mod::Cond::Reprogrammed
 			player->SetCustomVariable<"KilledAsNeutral">(Variant(false));
 		}
 		
-		DETOUR_MEMBER_CALL();
+		DETOUR_MEMBER_CALL(CTFPlayer_Spawn)();
 	}
 
 	void OnRemoveReprogrammedNeutral(CTFPlayer *player)
@@ -642,7 +573,7 @@ namespace Mod::Cond::Reprogrammed
 			return iWantedTeam;
 		}
 
-		return DETOUR_MEMBER_CALL(pPlayer, iWantedTeam, b1);
+		return DETOUR_MEMBER_CALL(CTFGameRules_GetTeamAssignmentOverride)(pPlayer, iWantedTeam, b1);
 	}
 
 	DETOUR_DECL_MEMBER(void, CTFPlayerShared_OnConditionAdded, ETFCond cond)
@@ -659,7 +590,7 @@ namespace Mod::Cond::Reprogrammed
 			return;
 		}
 
-		DETOUR_MEMBER_CALL(cond);
+		DETOUR_MEMBER_CALL(CTFPlayerShared_OnConditionAdded)(cond);
 		if (cond == TF_COND_MVM_BOT_STUN_RADIOWAVE) {
 			OnAddMVMBotRadiowave(shared->GetOuter());
 		}
@@ -678,7 +609,7 @@ namespace Mod::Cond::Reprogrammed
 			OnRemoveReprogrammedNeutral(shared->GetOuter());
 			return;
 		}
-		DETOUR_MEMBER_CALL(cond);
+		DETOUR_MEMBER_CALL(CTFPlayerShared_OnConditionRemoved)(cond);
 	}
 	
 	
@@ -688,13 +619,13 @@ namespace Mod::Cond::Reprogrammed
 			return ActionResult<CTFBot>::Continue();
 		}
 		
-		return DETOUR_MEMBER_CALL(actor, dt);
+		return DETOUR_MEMBER_CALL(CTFBotScenarioMonitor_Update)(actor, dt);
 	}
 	
 	
 	DETOUR_DECL_MEMBER(ActionResult<CTFBot>, CTFBotMainAction_Update, CTFBot *actor, float dt)
 	{
-		auto result = DETOUR_MEMBER_CALL(actor, dt);
+		auto result = DETOUR_MEMBER_CALL(CTFBotMainAction_Update)(actor, dt);
 		
 		if (result.transition == ActionTransition::CONTINUE && TFGameRules()->IsMannVsMachineMode() && actor->GetTeamNumber() != TF_TEAM_BLUE)
 		{
@@ -722,13 +653,13 @@ namespace Mod::Cond::Reprogrammed
 			return nullptr;
 		}
 		
-		return DETOUR_MEMBER_CALL();
+		return DETOUR_MEMBER_CALL(CTFPlayer_FindPartnerTauntInitiator)();
 	}
 	
 	
 	DETOUR_DECL_MEMBER(void, CTFGameRules_BetweenRounds_Start)
 	{
-		DETOUR_MEMBER_CALL();
+		DETOUR_MEMBER_CALL(CTFGameRules_BetweenRounds_Start)();
 		
 		if (cvar_hellmet.GetBool() && TFGameRules()->IsMannVsMachineMode()) {
 		//	for (int i = 0; i < IBaseObjectAutoList::AutoList().Count(); ++i) {
@@ -754,7 +685,7 @@ namespace Mod::Cond::Reprogrammed
 
 	//Red giant backstab instakill fix
 	DETOUR_DECL_MEMBER(float, CTFKnife_GetMeleeDamage, CBaseEntity *pTarget, int* piDamageType, int* piCustomDamage) {
-		float ret = DETOUR_MEMBER_CALL(pTarget, piDamageType, piCustomDamage);
+		float ret = DETOUR_MEMBER_CALL(CTFKnife_GetMeleeDamage)(pTarget, piDamageType, piCustomDamage);
 
 		if (pTarget->IsPlayer() && ret == pTarget->GetHealth() * 2 && ToTFPlayer(pTarget)->IsMiniBoss()) {
 			CTFKnife *weapon = reinterpret_cast<CTFKnife *>(this);
@@ -779,7 +710,7 @@ namespace Mod::Cond::Reprogrammed
 	DETOUR_DECL_MEMBER(void, CTFBotMissionSuicideBomber_Detonate, CTFBot *actor)
 	{
 		SCOPED_INCREMENT(rc_CTFBotMissionSuicideBomber_Detonate);
-		DETOUR_MEMBER_CALL(actor);
+		DETOUR_MEMBER_CALL(CTFBotMissionSuicideBomber_Detonate)(actor);
 	}
 
 	DETOUR_DECL_MEMBER(int, CTFPlayer_OnTakeDamage, const CTakeDamageInfo& info)
@@ -794,11 +725,11 @@ namespace Mod::Cond::Reprogrammed
 			{
 				CTakeDamageInfo newinfo = info;
 				newinfo.SetDamage( 600.f );
-				return DETOUR_MEMBER_CALL(newinfo);
+				return DETOUR_MEMBER_CALL(CTFPlayer_OnTakeDamage)(newinfo);
 			}
 		
 		}
-		return DETOUR_MEMBER_CALL(info);
+		return DETOUR_MEMBER_CALL(CTFPlayer_OnTakeDamage)(info);
 	}
 
 	DETOUR_DECL_MEMBER(int, CBaseCombatCharacter_OnTakeDamage, const CTakeDamageInfo& info)
@@ -808,15 +739,15 @@ namespace Mod::Cond::Reprogrammed
 			if (!character->IsPlayer() && !character->IsBaseObject()) {
 				CTakeDamageInfo newinfo = info;
 				newinfo.SetDamage( 600.f );
-				return DETOUR_MEMBER_CALL(newinfo);
+				return DETOUR_MEMBER_CALL(CBaseCombatCharacter_OnTakeDamage)(newinfo);
 			}
 		}
-		return DETOUR_MEMBER_CALL(info);
+		return DETOUR_MEMBER_CALL(CBaseCombatCharacter_OnTakeDamage)(info);
 	}
 
 	DETOUR_DECL_MEMBER(ActionResult<CTFBot>, CTFBotMedicHeal_Update, CTFBot *actor, float dt)
 	{
-		auto result = DETOUR_MEMBER_CALL(actor, dt);
+		auto result = DETOUR_MEMBER_CALL(CTFBotMedicHeal_Update)(actor, dt);
 		
 		if (cvar_hellmet.GetBool() && actor->GetTeamNumber() != TF_TEAM_BLUE && TFGameRules()->IsMannVsMachineMode()) {
 			bool is_changeto_fetchflag =
@@ -840,7 +771,7 @@ namespace Mod::Cond::Reprogrammed
 
 	DETOUR_DECL_MEMBER(bool, CObjectSapper_IsValidRoboSapperTarget, CTFPlayer *player)
 	{
-		auto result = DETOUR_MEMBER_CALL(player);
+		auto result = DETOUR_MEMBER_CALL(CObjectSapper_IsValidRoboSapperTarget)(player);
 		auto builder = reinterpret_cast<CObjectSapper *>(this)->GetBuilder();
 		return result || (player != nullptr && !(builder != nullptr && player->GetTeamNumber() == builder->GetTeamNumber()) && player->IsAlive() && player->m_Shared->InCond(TF_COND_REPROGRAMMED) && !player->m_Shared->IsInvulnerable() && !player->m_Shared->InCond(TF_COND_SAPPED));
 	}
@@ -868,7 +799,7 @@ namespace Mod::Cond::Reprogrammed
 			team = GetEnemyTeam(ourTeam);
 			setDisguiseTeamToSpec = true;
 		}
-		DETOUR_MEMBER_CALL(team, iclass, victim, onKill);
+		DETOUR_MEMBER_CALL(CTFPlayerShared_Disguise)(team, iclass, victim, onKill);
 		if (setDisguiseTeamToSpec) {
 			shared->m_nDesiredDisguiseTeam = TEAM_SPECTATOR;
 		}
@@ -879,7 +810,7 @@ namespace Mod::Cond::Reprogrammed
 	DETOUR_DECL_MEMBER(void, CTFPlayer_ModifyOrAppendCriteria, void *criteria)
 	{
 		SCOPED_INCREMENT_IF(rc_CTFPlayer_ModifyOrAppendCriteria, TFGameRules()->IsMannVsMachineMode() && *(reinterpret_cast<CTFPlayer *>(this)->GetPlayerClass()->GetCustomModel()) != 0 );
-		DETOUR_MEMBER_CALL(criteria);
+		DETOUR_MEMBER_CALL(CTFPlayer_ModifyOrAppendCriteria)(criteria);
 	}
 
 	DETOUR_DECL_STATIC(bool, TF_IsHolidayActive)
@@ -887,7 +818,7 @@ namespace Mod::Cond::Reprogrammed
 		if (rc_CTFPlayer_ModifyOrAppendCriteria)
 			return false;
 		else
-			return DETOUR_STATIC_CALL();
+			return DETOUR_STATIC_CALL(TF_IsHolidayActive)();
 	}
 	
 	RefCount rc_CTFGameRules_FireGameEvent__teamplay_round_start;
@@ -895,7 +826,7 @@ namespace Mod::Cond::Reprogrammed
 	{
 		SCOPED_INCREMENT_IF(rc_CTFGameRules_FireGameEvent__teamplay_round_start,
 			(event != nullptr && strcmp(event->GetName(), "teamplay_round_start") == 0));
-		DETOUR_MEMBER_CALL(event);
+		DETOUR_MEMBER_CALL(CTFGameRules_FireGameEvent)(event);
 	}
 	
 	RefCount rc_CBaseObject_FindSnapToBuildPos;
@@ -955,14 +886,14 @@ namespace Mod::Cond::Reprogrammed
 			CollectPlayers(playerVector, TF_TEAM_RED, isAlive, shouldAppend);
 			CollectPlayers(playerVector, TF_TEAM_BLUE, isAlive, true);
 		}
-		return DETOUR_STATIC_CALL(playerVector, team, isAlive, shouldAppend);
+		return DETOUR_STATIC_CALL(CollectPlayers_CTFPlayer)(playerVector, team, isAlive, shouldAppend);
 	}
 	
 	int getteam = -1;
     DETOUR_DECL_MEMBER(bool, CObjectSentrygun_FindTarget)
 	{
 		auto sentry = reinterpret_cast<CObjectSentrygun *>(this);
-        bool result = DETOUR_MEMBER_CALL();
+        bool result = DETOUR_MEMBER_CALL(CObjectSentrygun_FindTarget)();
         
         if (!result){
 			if (sentry->GetTeamNumber() > TEAM_SPECTATOR) {
@@ -979,7 +910,7 @@ namespace Mod::Cond::Reprogrammed
 				}
 				if (objs || hasplayers) {
 					getteam = TEAM_SPECTATOR;
-					result = DETOUR_MEMBER_CALL();
+					result = DETOUR_MEMBER_CALL(CObjectSentrygun_FindTarget)();
 				}
 			}
 			else if (sentry->GetTeamNumber() == TEAM_SPECTATOR) {
@@ -996,7 +927,7 @@ namespace Mod::Cond::Reprogrammed
 				}
 				if (objs || hasplayers) {
 					getteam = TF_TEAM_RED;
-					result = DETOUR_MEMBER_CALL();
+					result = DETOUR_MEMBER_CALL(CObjectSentrygun_FindTarget)();
 				}
 			}
         }
@@ -1008,13 +939,13 @@ namespace Mod::Cond::Reprogrammed
 	{
 		if (getteam >= 0)
 			team = getteam;
-		return DETOUR_MEMBER_CALL(team);
+		return DETOUR_MEMBER_CALL(CTFTeamManager_GetTeam)(team);
 	}
 
 	DETOUR_DECL_MEMBER(bool, NextBotPlayer_CTFPlayer_IsBot)
 	{
 		auto *bot = reinterpret_cast<NextBotPlayer<CTFPlayer> *>(this);
-		return DETOUR_MEMBER_CALL() && !(bot->GetTeamNumber() == TEAM_SPECTATOR && bot->IsAlive());
+		return DETOUR_MEMBER_CALL(NextBotPlayer_CTFPlayer_IsBot)() && !(bot->GetTeamNumber() == TEAM_SPECTATOR && bot->IsAlive());
 	}
 
 	CDetour *detour_isbot = nullptr;
@@ -1034,7 +965,7 @@ namespace Mod::Cond::Reprogrammed
 			team_spec->RemovePlayerNonVirtual(bot);
 		}
 
-		bool result = DETOUR_MEMBER_CALL(where, ents);
+		bool result = DETOUR_MEMBER_CALL(CTFBotSpawner_Spawn)(where, ents);
 		
 		for (CBasePlayer *bot : spec_players) {
 			team_spec->AddPlayerNonVirtual(bot);
@@ -1046,7 +977,7 @@ namespace Mod::Cond::Reprogrammed
 	DETOUR_DECL_MEMBER(void, CWave_ActiveWaveUpdate)
 	{
 		auto wave = reinterpret_cast<CWave *>(this);
-		DETOUR_MEMBER_CALL();
+		DETOUR_MEMBER_CALL(CWave_ActiveWaveUpdate)();
 		if (wave->IsDoneWithNonSupportWaves()) {
 			for (int i = 1; i < gpGlobals->maxClients; i++) {
 				CBasePlayer *player = UTIL_PlayerByIndex(i);
@@ -1084,7 +1015,7 @@ namespace Mod::Cond::Reprogrammed
 				}
 			}
 		}
-		return DETOUR_MEMBER_CALL(pServerEntity, contentsMask);
+		return DETOUR_MEMBER_CALL(CTraceFilterObject_ShouldHitEntity)(pServerEntity, contentsMask);
 	}
 
 	RefCount rc_CTFBot_Event_Killed;
@@ -1093,7 +1024,7 @@ namespace Mod::Cond::Reprogrammed
 		static ConVarRef cvar_player_team("sig_mvm_jointeam_blue_allow_force"); 
 		auto bot = reinterpret_cast<CTFBot *>(this);
 		SCOPED_INCREMENT_IF(rc_CTFBot_Event_Killed, cvar_player_team.GetBool() || bot->GetTeamNumber() == TF_TEAM_RED);
-		DETOUR_MEMBER_CALL(info);
+		DETOUR_MEMBER_CALL(CTFBot_Event_Killed)(info);
 	}
 
 	DETOUR_DECL_MEMBER(bool, IGameEventManager2_FireEvent, IGameEvent *event, bool bDontBroadcast)
@@ -1104,7 +1035,7 @@ namespace Mod::Cond::Reprogrammed
 			return false;
 		}
 		
-		return DETOUR_MEMBER_CALL(event, bDontBroadcast);
+		return DETOUR_MEMBER_CALL(IGameEventManager2_FireEvent)(event, bDontBroadcast);
 	}
 
 	DETOUR_DECL_MEMBER(bool, CTFBotMedicHeal_IsVisibleToEnemy, CTFBot *me, const Vector &where)
@@ -1113,7 +1044,7 @@ namespace Mod::Cond::Reprogrammed
 			return false;
 		}
 		
-		return DETOUR_MEMBER_CALL(me, where);
+		return DETOUR_MEMBER_CALL(CTFBotMedicHeal_IsVisibleToEnemy)(me, where);
 	}
 	
 	RefCount rc_CTFPlayer_ApplyPushFromDamage_block;
@@ -1132,7 +1063,7 @@ namespace Mod::Cond::Reprogrammed
 			} 
 		}
 		SCOPED_INCREMENT_IF(rc_CTFPlayer_ApplyPushFromDamage_block, block);
-		DETOUR_MEMBER_CALL(info, vec);
+		DETOUR_MEMBER_CALL(CTFPlayer_ApplyPushFromDamage)(info, vec);
 	}
 	
 	DETOUR_DECL_MEMBER(void, CTFPlayer_ApplyAbsVelocityImpulse, const Vector *v1)
@@ -1141,7 +1072,7 @@ namespace Mod::Cond::Reprogrammed
 
 		if (rc_CTFPlayer_ApplyPushFromDamage_block) return;
 		
-		DETOUR_MEMBER_CALL(v1);
+		DETOUR_MEMBER_CALL(CTFPlayer_ApplyAbsVelocityImpulse)(v1);
 	}
 
 	DETOUR_DECL_MEMBER(const char *, CTFWeaponBase_GetShootSound, int iIndex)
@@ -1154,7 +1085,7 @@ namespace Mod::Cond::Reprogrammed
 			weapon->SetTeamNumber(TF_TEAM_BLUE);
 		}
 
-		auto result = DETOUR_MEMBER_CALL(iIndex);
+		auto result = DETOUR_MEMBER_CALL(CTFWeaponBase_GetShootSound)(iIndex);
 
 		weapon->SetTeamNumber(oldWeaponTeam);
 		return result;
@@ -1172,7 +1103,7 @@ namespace Mod::Cond::Reprogrammed
 				}
 			}
 		}); 
-		DETOUR_STATIC_CALL(clientCount, clients, snapshot);
+		DETOUR_STATIC_CALL(SV_ComputeClientPacks)(clientCount, clients, snapshot);
 		for (auto &weapon : weaponsTeamSwitched) {
 			weapon.first->SetTeamNumber(weapon.second);
 		}
@@ -1195,7 +1126,7 @@ namespace Mod::Cond::Reprogrammed
 		}
 		//DevMsg("\n[Update]\n");
 		//DevMsg("reached goal %d,detonating %d,failures %d, %d %f %f\n",me->m_bDetReachedGoal, me->m_bDetonating ,me->m_nConsecutivePathFailures,ENTINDEX(me->m_hTarget), me->m_vecDetonatePos.x, me->m_vecTargetPos.x);
-		auto result = DETOUR_MEMBER_CALL(actor, dt);
+		auto result = DETOUR_MEMBER_CALL(CTFBotMissionSuicideBomber_Update)(actor, dt);
 		
 		return result;
 	}
@@ -1203,7 +1134,7 @@ namespace Mod::Cond::Reprogrammed
 	DETOUR_DECL_MEMBER(bool, CBaseObject_FindSnapToBuildPos, CBaseObject *pObjectOverride)
 	{
 		auto me = reinterpret_cast<CBaseObject *>(this);
-		bool success = DETOUR_MEMBER_CALL(pObjectOverride);
+		bool success = DETOUR_MEMBER_CALL(CBaseObject_FindSnapToBuildPos)(pObjectOverride);
 		
 		if (pObjectOverride != nullptr) return success;
 		
@@ -1284,12 +1215,12 @@ namespace Mod::Cond::Reprogrammed
 		if (me->GetTeamNumber() == TEAM_SPECTATOR && me->IsAlive()) {
 			return TFTeamMgr()->GetTeam(RandomInt(TF_TEAM_RED, TF_TEAM_BLUE));
 		}
-		return DETOUR_MEMBER_CALL();
+		return DETOUR_MEMBER_CALL(CTFPlayer_GetOpposingTFTeam)();
 	}
 
 	DETOUR_DECL_MEMBER_CALL_CONVENTION(__gcc_regcall, bool, CTFKnife_CanPerformBackstabAgainstTarget, CTFPlayer *target )
 	{
-		bool ret = DETOUR_MEMBER_CALL(target);
+		bool ret = DETOUR_MEMBER_CALL(CTFKnife_CanPerformBackstabAgainstTarget)(target);
 
 		if ( !ret && TFGameRules() && TFGameRules()->IsMannVsMachineMode() && target->GetTeamNumber() == TEAM_SPECTATOR )
 		{
@@ -1306,7 +1237,7 @@ namespace Mod::Cond::Reprogrammed
 	DETOUR_DECL_MEMBER(bool, CTFBotVision_IsIgnored, CBaseEntity *ent)
 	{
 		CTFBot *me = reinterpret_cast<CTFBot *>(reinterpret_cast<IVision *>(this)->GetBot()->GetEntity());
-		if (me->GetTeamNumber() != TEAM_SPECTATOR || !sig_cond_reprogrammed_neutral_spy_disguise.GetBool()) return DETOUR_MEMBER_CALL(ent);
+		if (me->GetTeamNumber() != TEAM_SPECTATOR || !sig_cond_reprogrammed_neutral_spy_disguise.GetBool()) return DETOUR_MEMBER_CALL(CTFBotVision_IsIgnored)(ent);
 		
 		auto player = ToTFPlayer(ent);
 		int restoreTeam = -1;
@@ -1316,7 +1247,7 @@ namespace Mod::Cond::Reprogrammed
 				player->m_Shared->m_nDisguiseTeam = me->GetTeamNumber();
 			}
 		}
-		bool ret = DETOUR_MEMBER_CALL(ent);
+		bool ret = DETOUR_MEMBER_CALL(CTFBotVision_IsIgnored)(ent);
 		if (restoreTeam != -1) {
 			player->m_Shared->m_nDisguiseTeam = restoreTeam;
 		}
@@ -1332,22 +1263,22 @@ namespace Mod::Cond::Reprogrammed
 			if (teamnum == TF_TEAM_RED || teamnum == TEAM_SPECTATOR) {
 				player->SetTeamNumber(TF_TEAM_BLUE);
 			}
-			DETOUR_MEMBER_CALL(info);
+			DETOUR_MEMBER_CALL(CTFPlayer_DeathSound)(info);
 			player->SetTeamNumber(teamnum);
 		}
 		else
-			DETOUR_MEMBER_CALL(info);
+			DETOUR_MEMBER_CALL(CTFPlayer_DeathSound)(info);
 	}
 
 	DETOUR_DECL_MEMBER(void, CTFPistol_ScoutPrimary_Push)
 	{
 		SCOPED_INCREMENT(rc_CollectPlayers_SpecEnemy);
-		DETOUR_MEMBER_CALL();
+		DETOUR_MEMBER_CALL(CTFPistol_ScoutPrimary_Push)();
 	}
 
     DETOUR_DECL_MEMBER(void, CTFPlayerShared_C2)
 	{
-		DETOUR_MEMBER_CALL();
+		DETOUR_MEMBER_CALL(CTFPlayerShared_C2)();
         reinterpret_cast<CTFPlayerShared *>(this)->m_ConditionData->EnsureCount(GetExtraConditionCount());
 	}
 	
@@ -1356,7 +1287,7 @@ namespace Mod::Cond::Reprogrammed
 		if (nCond < 0 || nCond >= GetExtraConditionCount()) {
             return;
         }
-		DETOUR_MEMBER_CALL(nCond, flDuration, pProvider);
+		DETOUR_MEMBER_CALL(CTFPlayerShared_AddCond)(nCond, flDuration, pProvider);
 	}
 	
     DETOUR_DECL_MEMBER(void, CTFPlayerShared_RemoveAllCond)
@@ -1369,7 +1300,7 @@ namespace Mod::Cond::Reprogrammed
 				shared->RemoveCond((ETFCond)i);
 			}
 		}
-		DETOUR_MEMBER_CALL();
+		DETOUR_MEMBER_CALL(CTFPlayerShared_RemoveAllCond)();
 	}
 
 	class CMod : public IMod, public IModCallbackListener, public IFrameUpdatePostEntityThinkListener

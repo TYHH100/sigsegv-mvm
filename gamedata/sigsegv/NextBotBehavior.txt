@@ -652,9 +652,8 @@
 				
 				"Action<CTFBot>::ApplyResult"
 				{
-					type "sym regex"
+					type "sym"
 					sym  "_ZN6ActionI6CTFBotE11ApplyResultEPS0_P8BehaviorIS0_E12ActionResultIS0_E"
-					sym64  "_ZN6ActionI6CTFBotE11ApplyResultEPS0_P8BehaviorIS0_E12ActionResultIS0_E\\.isra\\..*"
 				}
 				"Action<CTFBot>::InvokeOnEnd"
 				{
@@ -1321,9 +1320,8 @@
 				
 				"Action<CZombie>::ApplyResult"
 				{
-					type "sym regex"
+					type "sym"
 					sym  "_ZN6ActionI7CZombieE11ApplyResultEPS0_P8BehaviorIS0_E12ActionResultIS0_E"
-					sym64 "_ZN6ActionI7CZombieE11ApplyResultEPS0_P8BehaviorIS0_E12ActionResultIS0_E\\.isra\\..*"
 				}
 				"Action<CZombie>::InvokeOnEnd"
 				{

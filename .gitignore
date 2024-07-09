@@ -24,15 +24,4 @@ MSVC/Report*.csv
 
 libs/lua/
 sigsegv-mvm.kdev4
-libs/*.a
-/.vs/sigsegv-mvm/FileContentIndex
-/.vs/sigsegv-mvm/FileContentIndex/1aae6c45-a8e4-48d5-bfb8-1627d2a91567.vsidx
-/.vs/sigsegv-mvm/FileContentIndex/34d12415-9551-4fd8-8534-f618e7e8078b.vsidx
-/.vs/sigsegv-mvm/FileContentIndex/7211ab8d-d3d3-4dfc-9587-ed66e6b172b1.vsidx
-/.vs/sigsegv-mvm/FileContentIndex/f1426dc7-5f90-450a-9175-ba84b1f66bae.vsidx
-/.vs/sigsegv-mvm/v17
-/.vs/sigsegv-mvm/v17/.wsuo
-/.vs/sigsegv-mvm/v17/DocumentLayout.json
-/.vs/sigsegv-mvm/v17/workspaceFileList.bin
-/.vs/slnx.sqlite
-/.vs/VSWorkspaceState.json
+/.vs

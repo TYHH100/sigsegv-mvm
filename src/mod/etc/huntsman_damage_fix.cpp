@@ -12,7 +12,7 @@ namespace Mod::Etc::Huntsman_Damage_Fix
 		auto bow = reinterpret_cast<CTFCompoundBow *>(this);
 		
 		if (ToTFPlayer(bow->GetOwner())->IsBot())
-			return DETOUR_MEMBER_CALL();
+			return DETOUR_MEMBER_CALL(CTFCompoundBow_GetProjectileDamage)();
 
 		float flBaseDamage;
 		float flChargeDamage;
@@ -21,7 +21,7 @@ namespace Mod::Etc::Huntsman_Damage_Fix
 			flBaseClassProjectileDamage = 0.0f;
 			SCOPED_INCREMENT(rc_CTFCompoundBow_GetProjectileDamage);
 			
-			(void)DETOUR_MEMBER_CALL();
+			(void)DETOUR_MEMBER_CALL(CTFCompoundBow_GetProjectileDamage)();
 			
 			flChargeDamage = flBaseClassProjectileDamage;
 		}
@@ -47,7 +47,7 @@ namespace Mod::Etc::Huntsman_Damage_Fix
 	
 	DETOUR_DECL_MEMBER(float, CTFWeaponBaseGun_GetProjectileDamage)
 	{
-		float flDamage = DETOUR_MEMBER_CALL();
+		float flDamage = DETOUR_MEMBER_CALL(CTFWeaponBaseGun_GetProjectileDamage)();
 		
 		if (rc_CTFCompoundBow_GetProjectileDamage > 0) {
 			flBaseClassProjectileDamage = flDamage;
@@ -62,7 +62,7 @@ namespace Mod::Etc::Huntsman_Damage_Fix
 	{
 		float normal_time = 1.0f;
 
-		float actual_charge = DETOUR_MEMBER_CALL();
+		float actual_charge = DETOUR_MEMBER_CALL(CTFCompoundBow_GetChargeMaxTime)();
 
 		auto bow = reinterpret_cast<CTFCompoundBow *>(this);
 		

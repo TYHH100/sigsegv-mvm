@@ -15,7 +15,7 @@ namespace Mod::MvM::Disposable_Sentry_Health_Upgrades
 		int max_health = sentry->GetMaxHealth();
 		
 		SCOPED_INCREMENT(rc_CObjectSentrygun_MakeDisposableBuilding);
-		DETOUR_MEMBER_CALL(owner);
+		DETOUR_MEMBER_CALL(CObjectSentrygun_MakeDisposableBuilding)(owner);
 		
 		sentry->SetMaxHealth(max_health);
 	}
@@ -30,7 +30,7 @@ namespace Mod::MvM::Disposable_Sentry_Health_Upgrades
 			return;
 		}
 		
-		DETOUR_MEMBER_CALL(amt);
+		DETOUR_MEMBER_CALL(CBaseObject_SetHealth)(amt);
 	}
 	
 	
@@ -41,7 +41,7 @@ namespace Mod::MvM::Disposable_Sentry_Health_Upgrades
 		
 		bool m_bDisposableBuilding = obj->m_bDisposableBuilding;
 		obj->m_bDisposableBuilding = false;
-		int ret = DETOUR_MEMBER_CALL();
+		int ret = DETOUR_MEMBER_CALL(CBaseObject_GetMaxHealthForCurrentLevel)();
 		obj->m_bDisposableBuilding = m_bDisposableBuilding;
 		
 		return ret;

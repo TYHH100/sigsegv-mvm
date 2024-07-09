@@ -22,7 +22,7 @@ namespace Mod::Perf::Clientside_Wearable_Optimize
 
 	DETOUR_DECL_MEMBER(void, CBasePlayer_EquipWearable, CEconWearable *wearable)
 	{
-		DETOUR_MEMBER_CALL(wearable);
+		DETOUR_MEMBER_CALL(CBasePlayer_EquipWearable)(wearable);
         auto item = wearable->GetItem() ;
         if (item == nullptr) return;
         THINK_FUNC_SET(wearable, Unfollow, gpGlobals->curtime);

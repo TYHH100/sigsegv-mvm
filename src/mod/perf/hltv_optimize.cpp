@@ -85,17 +85,16 @@ namespace Mod::Perf::HLTV_Optimize
         if (hasplayer && hltvclient != nullptr) {
             if (hltvServerEmpty) {
                 int tickcount = 32.0f / (snapshotrate.GetFloat() * gpGlobals->interval_per_tick);
-                int framec = rtti_scast<CClientFrameManager *>(hltvserver)->CountClientFrames() - 2;
-                for (int i = 0; i < framec; i++) {
-                    rtti_scast<CClientFrameManager *>(hltvserver)->RemoveOldestFrame();
-                }
+                int framec = hltvserver->CountClientFrames() - 2;
+                for (int i = 0; i < framec; i++)
+                    hltvserver->RemoveOldestFrame();
                 //DevMsg("SendNow %d\n", gpGlobals->tickcount % tickcount == 0/*reinterpret_cast<CGameClient *>(hltvclient)->ShouldSendMessages()*/);
                 if (gpGlobals->tickcount % tickcount != 0)
                     return;
             }
         }
 
-		DETOUR_MEMBER_CALL();
+		DETOUR_MEMBER_CALL(CHLTVServer_RunFrame)();
 	}
 
     DETOUR_DECL_MEMBER(void, CHLTVServer_UpdateTick)
@@ -106,15 +105,15 @@ namespace Mod::Perf::HLTV_Optimize
             static ConVarRef delay("tv_delay");
             int tickcount = 1.0f / (snapshotrate.GetFloat() * gpGlobals->interval_per_tick);
             if (delay.GetFloat() <= 0) {
-                int framec = rtti_scast<CClientFrameManager *>(hltvserver)->CountClientFrames() - 2;
+                int framec = hltvserver->CountClientFrames() - 2;
                 for (int i = 0; i < framec; i++)
-                    rtti_scast<CClientFrameManager *>(hltvserver)->RemoveOldestFrame();
+                    hltvserver->RemoveOldestFrame();
             }
             //DevMsg("SendNow %d\n", gpGlobals->tickcount % tickcount == 0/*reinterpret_cast<CGameClient *>(hltvclient)->ShouldSendMessages()*/);
             // if (gpGlobals->tickcount % tickcount != 0)
             //    return;
         }
-		DETOUR_MEMBER_CALL();
+		DETOUR_MEMBER_CALL(CHLTVServer_UpdateTick)();
     }
 
     int last_restore_tick = -1;
@@ -126,7 +125,7 @@ namespace Mod::Perf::HLTV_Optimize
             //return;
         
         //TIME_SCOPE2(RESTORE);
-        DETOUR_MEMBER_CALL(time);
+        DETOUR_MEMBER_CALL(CHLTVServer_RestoreTick)(time);
         last_restore_tick = time;
     }
 
@@ -151,13 +150,13 @@ namespace Mod::Perf::HLTV_Optimize
             }
         }
         if (hasChanges/*tick == 0 || (last_change > last_restore_tick && last_change <= tick)*/) {
-            DETOUR_MEMBER_CALL(tick);
+            DETOUR_MEMBER_CALL(CNetworkStringTable_RestoreTick)(tick);
         }
     }
     
     DETOUR_DECL_MEMBER(void, CNetworkStringTable_UpdateMirrorTable, int tick)
     {
-        DETOUR_MEMBER_CALL(tick);
+        DETOUR_MEMBER_CALL(CNetworkStringTable_UpdateMirrorTable)(tick);
         auto table = reinterpret_cast<CNetworkStringTable *>(this);
 
         if (table->m_pMirrorTable != nullptr) {
@@ -172,7 +171,7 @@ namespace Mod::Perf::HLTV_Optimize
 		if (player->GetTeamNumber() <= TEAM_SPECTATOR && !player->IsAlive() && gpGlobals->curtime - player->GetDeathTime() > 1.0f && gpGlobals->tickcount % 64 != 0)
 			return;
             
-		DETOUR_MEMBER_CALL();
+		DETOUR_MEMBER_CALL(NextBotPlayer_CTFPlayer_PhysicsSimulate)();
 	}
 #endif
 
@@ -184,12 +183,12 @@ namespace Mod::Perf::HLTV_Optimize
 			return;
         }
             
-		DETOUR_MEMBER_CALL();
+		DETOUR_MEMBER_CALL(CBasePlayer_PhysicsSimulate)();
 	}
 
     DETOUR_DECL_MEMBER(CBaseClient *, CBaseServer_GetFreeClient, netadr_t &adr)
 	{
-        auto result = DETOUR_MEMBER_CALL(adr);
+        auto result = DETOUR_MEMBER_CALL(CBaseServer_GetFreeClient)(adr);
         if (create_hltv_bot == -1 && result != nullptr) {
             create_hltv_bot = result->m_nClientSlot + 1;
         }
@@ -202,32 +201,32 @@ namespace Mod::Perf::HLTV_Optimize
         auto player = reinterpret_cast<CPlayer *>(this);
         auto edict = ft_CPlayer_GetEdict(player);
         auto cbaseplayer = reinterpret_cast<CBasePlayer *>(edict->GetUnknown());
-        auto result = DETOUR_MEMBER_CALL();
+        auto result = DETOUR_MEMBER_CALL(CPlayer_IsSourceTV)();
         return result || (cbaseplayer != nullptr && (create_hltv_bot == edict->m_EdictIndex || cbaseplayer->IsHLTV()));
     }
 
 	DETOUR_DECL_MEMBER(void, CHLTVDemoRecorder_RecordStringTables)
 	{
         recording = true;
-        DETOUR_MEMBER_CALL();
+        DETOUR_MEMBER_CALL(CHLTVDemoRecorder_RecordStringTables)();
     }
 
 	DETOUR_DECL_MEMBER_CALL_CONVENTION(__gcc_regcall, void, CHLTVDemoRecorder_StopRecording_clone)
 	{
         recording = false;
-        DETOUR_MEMBER_CALL();
+        DETOUR_MEMBER_CALL(CHLTVDemoRecorder_StopRecording_clone)();
     }
 
 	DETOUR_DECL_MEMBER(void, CHLTVDemoRecorder_StopRecording)
 	{
         recording = false;
-        DETOUR_MEMBER_CALL();
+        DETOUR_MEMBER_CALL(CHLTVDemoRecorder_StopRecording)();
     }
 
 	DETOUR_DECL_MEMBER(bool, CGameClient_ShouldSendMessages)
 	{
         auto client = reinterpret_cast<CGameClient *>(this);
-        if (!client->m_bIsHLTV) return DETOUR_MEMBER_CALL();
+        if (!client->m_bIsHLTV) return DETOUR_MEMBER_CALL(CGameClient_ShouldSendMessages)();
         static ConVarRef tv_snapshotrate("tv_snapshotrate");
         float restore = FLT_MIN;
         if (hltvServerEmpty && !recording) {
@@ -238,7 +237,7 @@ namespace Mod::Perf::HLTV_Optimize
             restore = tv_snapshotrate.GetFloat();
             tv_snapshotrate.SetValue(cvar_rate_between_rounds.GetFloat());
         }
-        auto result = DETOUR_MEMBER_CALL();
+        auto result = DETOUR_MEMBER_CALL(CGameClient_ShouldSendMessages)();
         if (restore != FLT_MIN) {
             tv_snapshotrate.SetValue(restore);
         }

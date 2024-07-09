@@ -17,11 +17,7 @@ namespace Mod::Etc::Override_Move_Speed
 	
 	
 	constexpr uint8_t s_Buf_Server[] = {
-#ifdef PLATFORM_64BITS
-		0xc7, 0x45, 0x3c, 0x00, 0x00, 0x02, 0x44,  // +0x0000 mov     dword ptr [r13+3Ch], 44020000h
-#else
 		0xc7, 0x47, 0x3c, 0x00, 0x00, 0x02, 0x44, // +0000 mov dword ptr [edi+0x3c],520.0f
-#endif
 	};
 	
 	struct CPatch_CTFGameMovement_ProcessMovement_Server : public CPatch
@@ -42,8 +38,8 @@ namespace Mod::Etc::Override_Move_Speed
 		virtual bool GetPatchInfo(ByteBuf& buf, ByteBuf& mask) const override
 		{
 			/* NOP out the assignment of pMove->m_flMaxSpeed */
-			buf.SetRange(0x00, 0x07, 0x90);
-			mask.SetRange(0x00, 0x07, 0xff);
+			buf.SetRange(0x00, 7, 0x90);
+			mask.SetRange(0x00, 7, 0xff);
 			
 			return true;
 		}
@@ -98,7 +94,7 @@ namespace Mod::Etc::Override_Move_Speed
 			CMoveData_Set_MaxSpeed(pMove, cvar_limit.GetFloat());
 		}
 		
-		DETOUR_MEMBER_CALL(pBasePlayer, pMove);
+		DETOUR_MEMBER_CALL(CTFGameMovement_ProcessMovement)(pBasePlayer, pMove);
 	}
 	
 	DETOUR_DECL_MEMBER(void, CTFGameMovement_ProcessMovement_client, CBasePlayer *pBasePlayer, CMoveData *pMove)
@@ -107,7 +103,7 @@ namespace Mod::Etc::Override_Move_Speed
 			CMoveData_Set_MaxSpeed(pMove, cvar_limit.GetFloat());
 		}
 		
-		DETOUR_MEMBER_CALL(pBasePlayer, pMove);
+		DETOUR_MEMBER_CALL(CTFGameMovement_ProcessMovement_client)(pBasePlayer, pMove);
 	}
 	
 	

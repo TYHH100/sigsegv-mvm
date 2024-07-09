@@ -4,7 +4,6 @@
 #include "mem/protect.h"
 #include "mem/opcode.h"
 #include "mem/wrapper.h"
-#include "mem/func_copy.h"
 #include "util/backtrace.h"
 #include "util/demangle.h"
 #include "util/misc.h"
@@ -15,8 +14,8 @@
 #include <regex>
 
 
-#if !(defined(__i386__) || defined(_M_IX86) || defined(__x86_64__) )
-#error Architecture must be IA32/64
+#if !(defined(__i386) || defined(_M_IX86))
+#error Architecture must be IA32
 #endif
 
 
@@ -30,16 +29,142 @@
 #include "util/trace.h"
 
 
+/* get number of instruction operands */
+static unsigned int UD86_num_operands(struct ud *ud)
+{
+	for (unsigned int i = 0; i < 4; ++i) {
+		if (ud_insn_opr(ud, i) == nullptr) return i;
+	}
+	return 4;
+}
+
+
+/* detect instruction: '(jmp|call) <rel_imm32>' */
+static bool UD86_insn_is_jmpcall_rel_imm32(struct ud *ud, uint8_t *opcode_byte = nullptr, int32_t *rel_offset = nullptr)
+{
+	auto mnemonic = ud_insn_mnemonic(ud);
+	if (mnemonic != UD_Ijmp && mnemonic != UD_Icall) return false;
+	
+	if (ud_insn_len(ud) != 5)       return false;
+	if (UD86_num_operands(ud) != 1) return false;
+	
+	const auto *op0 = ud_insn_opr(ud, 0);
+	if (op0->type != UD_OP_JIMM) return false;
+	if (op0->size != 32)         return false;
+	
+	/* optional parameter: write out the main opcode byte */
+	if (opcode_byte != nullptr) {
+		*opcode_byte = ud_insn_ptr(ud)[0];
+	}
+	
+	/* optional parameter: write out the relative jmp/call offset */
+	if (rel_offset != nullptr) {
+		*rel_offset = op0->lval.sdword;
+	}
+	
+	return true;
+}
+
+/* detect instruction: 'call <rel_imm32>' */
+static bool UD86_insn_is_call_rel_imm32(struct ud *ud, const uint8_t **call_target = nullptr)
+{
+	auto mnemonic = ud_insn_mnemonic(ud);
+	if (mnemonic != UD_Icall) return false;
+	
+	if (ud_insn_len(ud) != 5)       return false;
+	if (UD86_num_operands(ud) != 1) return false;
+	
+	const auto *op0 = ud_insn_opr(ud, 0);
+	if (op0->type != UD_OP_JIMM) return false;
+	if (op0->size != 32)         return false;
+	
+	/* optional parameter: write out the call destination address */
+	if (call_target != nullptr) {
+		*call_target = (const uint8_t *)(ud_insn_off(ud) + ud_insn_len(ud) + op0->lval.udword);
+	}
+	
+	return true;
+}
+
+/* detect instruction: 'mov e[acdb]x,[esp]' */
+static bool UD86_insn_is_mov_r32_rtnval(struct ud *ud, Reg *dest_reg = nullptr)
+{
+	auto mnemonic = ud_insn_mnemonic(ud);
+	if (mnemonic != UD_Imov) return false;
+	
+	if (ud_insn_len(ud) != 3)       return false;
+	if (UD86_num_operands(ud) != 2) return false;
+	
+	const auto *op0 = ud_insn_opr(ud, 0);
+	if (op0->type != UD_OP_REG) return false;
+	if (op0->size != 32)        return false;
+	
+	Reg reg;
+	switch (op0->base) {
+	case UD_R_EAX: reg = REG_AX; break;
+	case UD_R_ECX: reg = REG_CX; break;
+	case UD_R_EDX: reg = REG_DX; break;
+	case UD_R_EBX: reg = REG_BX; break;
+	default: return false;
+	}
+	
+	const auto *op1 = ud_insn_opr(ud, 1);
+	if (op1->type   != UD_OP_MEM) return false;
+	if (op1->size   != 32)        return false;
+	if (op1->base   != UD_R_ESP)  return false;
+	if (op1->index  != UD_NONE)   return false;
+	if (op1->scale  != UD_NONE)   return false;
+	if (op1->offset != 0)         return false;
+	
+	/* optional parameter: write out the first operand base register */
+	if (dest_reg != nullptr) {
+		*dest_reg = reg;
+	}
+	
+	return true;
+}
+
+/* detect instruction: 'ret' */
+static bool UD86_insn_is_ret(struct ud *ud)
+{
+	auto mnemonic = ud_insn_mnemonic(ud);
+	if (mnemonic != UD_Iret) return false;
+	
+	if (ud_insn_len(ud) != 1)       return false;
+	if (UD86_num_operands(ud) != 0) return false;
+	
+	return true;
+}
+
+
+/* detect whether an instruction is a call to __i686.get_pc_thunk.(ax|cx|dx|bx) */
+static bool UD86_insn_is_call_to_get_pc_thunk(struct ud *ud, Reg *dest_reg = nullptr)
+{
+	const uint8_t *call_target;
+	if (!UD86_insn_is_call_rel_imm32(ud, &call_target)) return false;
+	
+	ud_t ux;
+	ud_init(&ux);
+	ud_set_mode(&ux, 32);
+	ud_set_pc(&ux, (uint64_t)call_target);
+	ud_set_input_buffer(&ux, call_target, 0x100);
+	
+	if (ud_decode(&ux) == 0) return false;
+	if (!UD86_insn_is_mov_r32_rtnval(&ux, dest_reg)) return false;
+	
+	if (ud_decode(&ux) == 0) return false;
+	if (!UD86_insn_is_ret(&ux)) return false;
+	
+	return true;
+}
+
+
 /* analogous to asm.c copy_bytes() when dest == nullptr */
 static size_t Trampoline_CalcNumBytesToCopy(size_t len_min, const uint8_t *func)
 {
 	ud_t ud;
 	ud_init(&ud);
-#ifdef PLATFORM_64BITS
-	ud_set_mode(&ud, 64);
-#else
 	ud_set_mode(&ud, 32);
-#endif
 	ud_set_pc(&ud, (uint64_t)func);
 	ud_set_input_buffer(&ud, func, 0x100);
 	
@@ -47,48 +172,51 @@ static size_t Trampoline_CalcNumBytesToCopy(size_t len_min, const uint8_t *func)
 	while (len_actual < len_min) {
 		size_t len_decoded = ud_decode(&ud);
 		assert(len_decoded != 0);
-
 		len_actual += len_decoded;
 	}
 	return len_actual;
 }
 
-static bool Jump_ShouldUseRelativeJump(intptr_t from, intptr_t target)
+/* analogous to asm.c copy_bytes() when dest != nullptr */
+static size_t Trampoline_CopyAndFixUpFuncBytes(size_t len_min, const uint8_t *func, uint8_t *trampoline)
 {
-#ifndef PLATFORM_64BITS
-	return true;
-#endif
-	auto offset = (intptr_t)target - ((intptr_t)from + (intptr_t)JmpRelImm32::Size());
-	return offset < INT_MAX && offset > INT_MIN;
-}
-
-static size_t Jump_CalculateSize(intptr_t from, intptr_t target)
-{
-	auto size = Jump_ShouldUseRelativeJump(from, target) ? JmpRelImm32::Size() : JmpIndirectMem32::Size() + sizeof(intptr_t);
-	return size;
-}
-
-static void Jump_WriteJump(uint8_t *from, uintptr_t target, size_t padSize)
-{
-	if (Jump_ShouldUseRelativeJump((intptr_t) from, (intptr_t) target)) {
-		auto jmp = JmpRelImm32(from, target);
-		if (padSize > 0) 
-			jmp.WritePadded(padSize);
-		else 
-			jmp.Write();
-	}
-	else {
-		auto pointerAddress = (uintptr_t)from + JmpIndirectMem32::Size();
-		auto jmp = JmpIndirectMem32(from, pointerAddress - ((uintptr_t)from + JmpIndirectMem32::Size()));
-		if (padSize > 0) 
-			jmp.WritePadded(padSize);
-		else 
-			jmp.Write();
+	uint8_t *dest = trampoline;
+	
+	ud_t ud;
+	ud_init(&ud);
+	ud_set_mode(&ud, 32);
+	ud_set_pc(&ud, (uint64_t)func);
+	ud_set_input_buffer(&ud, func, 0x100);
+	
+	size_t len_actual = 0;
+	while (len_actual < len_min) {
+		size_t len_decoded = ud_decode(&ud);
+		assert(len_decoded != 0);
+		len_actual += len_decoded;
 		
-		*(uintptr_t *)pointerAddress = target;
+		/* detect calls to __i686.get_pc_thunk.(ax|cx|dx|bx);
+		 * convert them into direct-register-load operations */
+		Reg reg;
+		if (UD86_insn_is_call_to_get_pc_thunk(&ud, &reg)) {
+			uint32_t pc_value = (ud_insn_off(&ud) + ud_insn_len(&ud) + (trampoline - func));
+			MovRegImm32(dest, reg, pc_value).Write();
+		} else {
+			/* fixup jmp and call relative offsets */
+			uint8_t opcode_byte;
+			int32_t rel_offset;
+			if (UD86_insn_is_jmpcall_rel_imm32(&ud, &opcode_byte, &rel_offset)) {
+				rel_offset += (trampoline - func);
+				*dest = opcode_byte;
+				*reinterpret_cast<int32_t *>(dest + 1) = rel_offset;
+			} else {
+				memcpy(dest, (uint8_t *)ud_insn_off(&ud), len_decoded);
+			}
+		}
+		
+		dest += len_decoded;
 	}
+	return len_actual;
 }
-
 #warning ALL OF THIS NEEDS TESTING!
 
 
@@ -403,7 +531,7 @@ void CFuncVProf::TracePost()
 	}
 }
 
-constexpr bool s_bGameHasOptimizedVirtuals = false;// = SOURCE_ENGINE == SE_TF2;
+constexpr bool s_bGameHasOptimizedVirtuals = SOURCE_ENGINE == SE_TF2;
 
 CDetouredFunc::CDetouredFunc(void *func_ptr) :
 	m_pFunc(reinterpret_cast<uint8_t *>(func_ptr))
@@ -548,7 +676,7 @@ void CDetouredFunc::CreateWrapper()
 {
 	TRACE("[this: %08x]", (uintptr_t)this);
 	
-#if !defined _WINDOWS && defined TRACE_DETOUR_ENABLED
+#if !defined _WINDOWS
 	this->m_pWrapper = TheExecMemManager()->AllocWrapper();
 	{
 		MemProtModifier_RX_RWX(this->m_pWrapper, Wrapper::Size());
@@ -578,7 +706,7 @@ void CDetouredFunc::DestroyWrapper()
 {
 	TRACE("[this: %08x]", (uintptr_t)this);
 	
-#if !defined _WINDOWS && defined TRACE_DETOUR_ENABLED
+#if !defined _WINDOWS
 	if (this->m_pWrapper != nullptr) {
 		this->ValidateWrapper();
 		
@@ -588,37 +716,34 @@ void CDetouredFunc::DestroyWrapper()
 #endif
 }
 
+
 void CDetouredFunc::CreateTrampoline()
 {
 	TRACE("[this: %08x]", (uintptr_t)this);
-
-	size_t len_prologue = Trampoline_CalcNumBytesToCopy(this->m_zJumpSize, this->m_pFunc);
-	TRACE_MSG("len_prologue = %zu\n", len_prologue);
-
-	size_t len_trampoline_alloc = len_prologue + 4 + (IsPlatform64Bits() ? JmpIndirectMem32::Size() + sizeof(uintptr_t) : JmpRelImm32::Size());
 	
-	this->m_pTrampoline = TheExecMemManager()->AllocTrampoline(len_trampoline_alloc);
+	size_t len_prologue = Trampoline_CalcNumBytesToCopy(JmpRelImm32::Size(), this->m_pFunc);
+	TRACE_MSG("len_prologue = %zu\n", len_prologue);
+	assert(len_prologue >= JmpRelImm32::Size());
+	
+	size_t len_trampoline = len_prologue + JmpRelImm32::Size();
+	TRACE_MSG("len_trampoline = %zu\n", len_trampoline);
+	
+	this->m_pTrampoline = TheExecMemManager()->AllocTrampoline(len_trampoline);
 	TRACE_MSG("trampoline @ %08x\n", (uintptr_t)this->m_pTrampoline);
 	
-	bool jumpInTrampolineRelative = Jump_ShouldUseRelativeJump((intptr_t)this->m_pTrampoline + len_prologue, (intptr_t)this->m_pFunc + len_prologue);
-	size_t jumpInTrampolineSize = Jump_CalculateSize((intptr_t)this->m_pTrampoline + len_prologue, (intptr_t)this->m_pFunc + len_prologue);
-
 	assert(this->m_OriginalPrologue.empty());
 	this->m_OriginalPrologue.resize(len_prologue);
 	memcpy(this->m_OriginalPrologue.data(), this->m_pFunc, len_prologue);
-	size_t len_trampoline;
+	
 	{
-		MemProtModifier_RX_RWX(this->m_pTrampoline, len_trampoline_alloc);
-		len_trampoline = CopyAndFixUpFuncBytes(len_prologue, this->m_pFunc, this->m_pTrampoline);
-		//Msg("trampoline addr %p len trampoline %zu alloc %zu jumps %zu prologue %zu\n", this->m_pTrampoline, len_trampoline, len_trampoline_alloc, jumpInTrampolineSize, len_prologue);
-		TRACE_MSG("len_trampoline = %zu\n", len_trampoline);
-
-		assert(len_trampoline + jumpInTrampolineSize <= len_trampoline_alloc);
-		Jump_WriteJump(this->m_pTrampoline + len_trampoline, (uintptr_t)this->m_pFunc + len_prologue, 0);
+		MemProtModifier_RX_RWX(this->m_pTrampoline, len_trampoline);
+		assert(Trampoline_CopyAndFixUpFuncBytes(JmpRelImm32::Size(), this->m_pFunc, this->m_pTrampoline) == len_prologue);
+		JmpRelImm32(this->m_pTrampoline + len_prologue, (uint32_t)this->m_pFunc + len_prologue).Write();
 	}
+	
 	assert(this->m_TrampolineCheck.empty());
-	this->m_TrampolineCheck.resize(len_trampoline + jumpInTrampolineSize);
-	memcpy(this->m_TrampolineCheck.data(), this->m_pTrampoline, len_trampoline + jumpInTrampolineSize);
+	this->m_TrampolineCheck.resize(len_trampoline);
+	memcpy(this->m_TrampolineCheck.data(), this->m_pTrampoline, len_trampoline);
 }
 
 void CDetouredFunc::DestroyTrampoline()
@@ -655,12 +780,11 @@ void CDetouredFunc::Reconfigure()
 	void *jump_to = nullptr;
 	
 	if (!this->m_Detours.empty()) {
-		//Msg("Installing detour %s\n", AddrManager::ReverseLookup(this->m_pFunc));
+
+		this->CreateTrampoline();
 		CDetour *first = this->m_Detours.front();
 		CDetour *last  = this->m_Detours.back();
-		this->m_bJumpIsRelative = Jump_ShouldUseRelativeJump((intptr_t)this->m_pFunc, (intptr_t)first->m_pCallback);
-		this->m_zJumpSize = Jump_CalculateSize((intptr_t)this->m_pFunc, (intptr_t)first->m_pCallback);
-		this->CreateTrampoline();
+		
 		TRACE_MSG("detour[\"%s\"].inner [%08x] -> trampoline [%08x]\n",
 			last->GetName(), (uintptr_t)last->m_pInner, (uintptr_t)this->m_pTrampoline);
 		*last->m_pInner = this->m_pTrampoline;
@@ -691,7 +815,7 @@ void CDetouredFunc::Reconfigure()
 		this->InstallJump(first->m_pCallback);*/
 	}
 	
-#if !defined _WINDOWS && defined TRACE_DETOUR_ENABLED
+#if !defined _WINDOWS
 	if (!this->m_Traces.empty()) {
 
 		this->CreateWrapper();
@@ -734,8 +858,7 @@ void CDetouredFunc::InstallJump(void *target)
 	
 	{
 		MemProtModifier_RX_RWX(this->m_pFunc, this->m_OriginalPrologue.size());
-		
-		Jump_WriteJump(this->m_pFunc, (uintptr_t)target, this->m_OriginalPrologue.size() > this->m_zJumpSize ? this->m_OriginalPrologue.size() : 0);
+		JmpRelImm32(this->m_pFunc, (uint32_t)target).WritePadded(this->m_OriginalPrologue.size());
 	}
 	
 	this->m_CurrentPrologue.resize(this->m_OriginalPrologue.size());
@@ -769,7 +892,7 @@ void CDetouredFunc::UninstallJump()
 	
 	// Check if some extension had overriden our jump, but not when the game is in shutdown/restart state as it does not matter by then
 	int state = g_HostState.GetRef().m_currentState;
-	if (!this->ValidateCurrentPrologue() && !(state == 6 || state == 7)) {
+	if (!this->ValidateCurrentPrologue() && (state == 6 || state == 7)) {
 		const char *func_name = AddrManager::ReverseLookup(this->m_pFunc);
 		if (func_name == nullptr) func_name = "???";
 		
@@ -813,7 +936,7 @@ bool CDetouredFunc::Validate(const uint8_t *ptr, const std::vector<uint8_t>& vec
 }
 
 
-#if !defined _WINDOWS && defined TRACE_DETOUR_ENABLED
+#if !defined _WINDOWS
 
 void CDetouredFunc::FuncPre()
 {

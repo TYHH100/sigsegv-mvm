@@ -154,11 +154,7 @@ struct carea_t
 class CCollisionBSPData
 {
 public:
-#ifdef PLATFORM_64BITS
-    uint8_t pad[0x2C0];
-#else
     uint8_t pad[0x224];
-#endif
     int numareas;
     carea_t *map_areas;
 };
@@ -171,7 +167,7 @@ NOINLINE void SetTransmitAlways(CServerNetworkProperty *netProp, bool bAlways) {
     if ( bAlways || (parentIndex < MAX_EDICTS)) {
         transmitAlways->Set(edict->m_EdictIndex);
     }
-    else if (edict->m_fStateFlags & FL_EDICT_DIRTY_PVS_INFORMATION) {
+    else if (edict != nullptr && edict->m_fStateFlags & FL_EDICT_DIRTY_PVS_INFORMATION) {
         edict->m_fStateFlags &= ~FL_EDICT_DIRTY_PVS_INFORMATION;
         engine->BuildEntityClusterList(edict, &(netProp->m_PVSInfo));
     }
@@ -179,21 +175,7 @@ NOINLINE void SetTransmitAlways(CServerNetworkProperty *netProp, bool bAlways) {
 
 auto ourfunc1 = &SetTransmitAlways;
 
-REPLACE_FUNC_MEMBER(void, CBaseEntity_SetTransmit, CCheckTransmitInfo *pInfo, bool bAlways)
-{
-    auto entity = reinterpret_cast<CBaseEntity *>(this);
-    CServerNetworkProperty *netProp = entity->NetworkProp();
-    auto edict = netProp->m_pPev;
-    if (edict == nullptr) return;
-
-    pInfo->m_pTransmitEdict->Set(edict->m_EdictIndex);
-
-    if (transmitAlways) {
-        SetTransmitAlways(netProp, bAlways);
-    }
-
-    int parentIndex = netProp->m_hParent.GetEntryIndex();
-    if (parentIndex >= MAX_EDICTS || pInfo->m_pTransmitEdict->Get(parentIndex)) return;
+NOINLINE void SetTransmitParent(int parentIndex, CCheckTransmitInfo *pInfo, bool bAlways) {
     CBaseEntity *parent = (CBaseEntity *)(g_pWorldEdict+parentIndex)->GetUnknown();
 
     // Force our aiment and move parent to be sent.
@@ -201,11 +183,28 @@ REPLACE_FUNC_MEMBER(void, CBaseEntity_SetTransmit, CCheckTransmitInfo *pInfo, bo
         parent->SetTransmit(pInfo, bAlways);
     }
 }
+auto ourfunc2 = &SetTransmitParent;
+
+REPLACE_FUNC_MEMBER(void, CBaseEntity_SetTransmit, CCheckTransmitInfo *pInfo, bool bAlways)
+{
+    auto entity = reinterpret_cast<CBaseEntity *>(this);
+    CServerNetworkProperty *netProp = entity->NetworkProp();
+    int index = netProp->entindex();
+    int parentIndex = netProp->m_hParent.GetEntryIndex();
+
+    pInfo->m_pTransmitEdict->Set(index);
+
+    if (transmitAlways) {
+        (*ourfunc1)(netProp, bAlways);
+    }
+    if (parentIndex >= MAX_EDICTS || pInfo->m_pTransmitEdict->Get(parentIndex)) return;
+    (*ourfunc2)(parentIndex, pInfo, bAlways);
+}
 
 
 IChangeInfoAccessor *world_accessor = nullptr;
 CEdictChangeInfo *world_change_info = nullptr;
-CSharedEdictChangeInfo *g_SharedEdictChangeInfo = nullptr;
+CSharedEdictChangeInfo *g_SharedEdictChangeInfo;
 
 REPLACE_FUNC_MEMBER(IChangeInfoAccessor *, CBaseEdict_GetChangeAccessor)
 {
@@ -745,7 +744,7 @@ namespace Mod::Perf::SendProp_Optimize
     RefCount rc_CHLTVClient_SendSnapshot;
     DETOUR_DECL_MEMBER(void, CHLTVClient_SendSnapshot, CClientFrame *frame) {
         SCOPED_INCREMENT(rc_CHLTVClient_SendSnapshot);
-        DETOUR_MEMBER_CALL(frame);
+        DETOUR_MEMBER_CALL(CHLTVClient_SendSnapshot)(frame);
     }
     DETOUR_DECL_STATIC(void, SendTable_WritePropList,
         const SendTable *pTable,
@@ -764,7 +763,7 @@ namespace Mod::Perf::SendProp_Optimize
                 return;
             }
             if (prop_write_offset[objectID].empty()) {
-                DETOUR_STATIC_CALL(pTable, pState, nBits, pOut, objectID, pCheckProps, nCheckProps);
+                DETOUR_STATIC_CALL(SendTable_WritePropList)(pTable, pState, nBits, pOut, objectID, pCheckProps, nCheckProps);
                 return;
             }
             CDeltaBitsWriter deltaBitsWriter( pOut );
@@ -788,7 +787,7 @@ namespace Mod::Perf::SendProp_Optimize
                 
             return;
         }
-        DETOUR_STATIC_CALL(pTable, pState, nBits, pOut, objectID, pCheckProps, nCheckProps);
+        DETOUR_STATIC_CALL(SendTable_WritePropList)(pTable, pState, nBits, pOut, objectID, pCheckProps, nCheckProps);
     }
 
     DETOUR_DECL_STATIC(int, SendTable_CullPropsFromProxies,
@@ -978,7 +977,7 @@ namespace Mod::Perf::SendProp_Optimize
         //     //timer2.End();
         //     //DevMsg("Timer encode other %s %.9f\n", GetContainingEntity(edict)->GetClassname() ,timer2.GetDuration().GetSeconds());
         // }
-        //DETOUR_MEMBER_CALL(work_do.data(), work_do.size(), maxthreads, pool);
+        //DETOUR_MEMBER_CALL(CParallelProcessor_PackWork_t_Run)(work_do.data(), work_do.size(), maxthreads, pool);
         //DevMsg("duration for %d %f\n", maxthreads, timer.GetDuration().GetSeconds());
     }
 
@@ -997,7 +996,7 @@ namespace Mod::Perf::SendProp_Optimize
 	{
         if (rc_SV_ComputeClientPacks) return;
 
-        DETOUR_MEMBER_CALL(snapshot);
+        DETOUR_MEMBER_CALL(CGameClient_SetupPackInfo)(snapshot);
     }
 
 
@@ -1005,7 +1004,7 @@ namespace Mod::Perf::SendProp_Optimize
 	{
         if (rc_SV_ComputeClientPacks) return;
 
-        DETOUR_MEMBER_CALL();
+        DETOUR_MEMBER_CALL(CGameClient_SetupPrevPackInfo)();
     }
 
     uint16_t *areasConnected = nullptr;
@@ -1131,7 +1130,6 @@ namespace Mod::Perf::SendProp_Optimize
                     auto hParent = networkable->m_hParent.Get();
                     if (hParent == nullptr) break;
                     edict = hParent->edict();
-                    if (edict->m_fStateFlags & FL_EDICT_ALWAYS) break;
                     index = hParent->entindex();
                     if (addedToList.test(index)) break;
                     list.push_back(index);
@@ -1200,7 +1198,7 @@ namespace Mod::Perf::SendProp_Optimize
                 continue;
             }
         }
-        //return DETOUR_MEMBER_CALL(pInfo, pEdictIndices, nEdicts);
+        //return DETOUR_MEMBER_CALL(CServerGameEnts_CheckTransmit)(pInfo, pEdictIndices, nEdicts);
 
     }
 
@@ -1215,7 +1213,7 @@ namespace Mod::Perf::SendProp_Optimize
         if (areasConnected != nullptr) {
             return areasConnected[area1] == areasConnected[area2];
         }
-        return DETOUR_MEMBER_CALL(area1, area2);
+        return DETOUR_MEMBER_CALL(CServerGameEnts_CheckTransmit)(area1, area2);
     }
 
     DETOUR_DECL_STATIC(void, SV_ComputeClientPacks, int clientCount,  CGameClient **clients, CFrameSnapshot *snapshot)
@@ -1241,7 +1239,7 @@ namespace Mod::Perf::SendProp_Optimize
         }
         firstTransmit = true;
         if (!IsParallel()) {
-            DETOUR_STATIC_CALL(clientCount, clients, snapshot);
+            DETOUR_STATIC_CALL(SV_ComputeClientPacks)(clientCount, clients, snapshot);
 
             if (firstPack && packinfoOffset != 0) {
                 firstPack = false;
@@ -1348,7 +1346,7 @@ namespace Mod::Perf::SendProp_Optimize
         packWorkFinished.wait(false);
 
         SCOPED_INCREMENT(rc_SV_ComputeClientPacks);
-        DETOUR_STATIC_CALL(clientCount, clients, snapshot);
+        DETOUR_STATIC_CALL(SV_ComputeClientPacks)(clientCount, clients, snapshot);
 
         for (int i = 0; i < clientCount; i++) {
             CGameClient *client = clients[i];
@@ -1394,19 +1392,19 @@ namespace Mod::Perf::SendProp_Optimize
             return;
         }
 
-        DETOUR_MEMBER_CALL(clients, items, maxthreads, pool);
+        DETOUR_MEMBER_CALL(CParallelProcessor_CGameClient_Run)(clients, items, maxthreads, pool);
     }
 
 #ifdef SE_IS_TF2
     DETOUR_DECL_MEMBER_CALL_CONVENTION(__gcc_regcall, void, CTFPlayer_AddObject, CBaseObject *object)
 	{
-        DETOUR_MEMBER_CALL(object);
+        DETOUR_MEMBER_CALL(CTFPlayer_AddObject)(object);
         reinterpret_cast<CTFPlayer *>(this)->NetworkStateChanged();
     }
 
     DETOUR_DECL_MEMBER(void, CTFPlayer_RemoveObject, CBaseObject *object)
 	{
-        DETOUR_MEMBER_CALL(object);
+        DETOUR_MEMBER_CALL(CTFPlayer_RemoveObject)(object);
         reinterpret_cast<CTFPlayer *>(this)->NetworkStateChanged();
     }
 
@@ -1416,7 +1414,7 @@ namespace Mod::Perf::SendProp_Optimize
         if (pProvider != shared->GetConditionProvider(nCond))
             reinterpret_cast<CTFPlayer *>(shared->GetOuter())->NetworkStateChanged();
             
-		DETOUR_MEMBER_CALL(nCond, flDuration, pProvider);
+		DETOUR_MEMBER_CALL(CTFPlayerShared_AddCond)(nCond, flDuration, pProvider);
 	}
 #endif
 
@@ -1424,7 +1422,7 @@ namespace Mod::Perf::SendProp_Optimize
 	{
         
         int oldFlags = pOwner->edict()->m_fStateFlags;
-        DETOUR_MEMBER_CALL(flInterval, pOwner);
+        DETOUR_MEMBER_CALL(CAnimationLayer_StudioFrameAdvance)(flInterval, pOwner);
         if (pOwner->IsPlayer()) pOwner->edict()->m_fStateFlags = oldFlags | (pOwner->edict()->m_fStateFlags & ~(FL_FULL_EDICT_CHANGED));
     }
 
@@ -1436,7 +1434,7 @@ namespace Mod::Perf::SendProp_Optimize
 	{
         auto &flags = reinterpret_cast<CBaseAnimatingOverlay *>(this)->edict()->m_fStateFlags;
         int oldFlags = flags;
-        DETOUR_MEMBER_CALL(layer);
+        DETOUR_MEMBER_CALL(CBaseAnimatingOverlay_FastRemoveLayer)(layer);
         if (reinterpret_cast<CBaseAnimatingOverlay *>(this)->IsPlayer()) flags = oldFlags | (flags & ~(FL_FULL_EDICT_CHANGED));
     }
 
@@ -1444,7 +1442,7 @@ namespace Mod::Perf::SendProp_Optimize
 	{;
         auto &flags = reinterpret_cast<CBaseAnimatingOverlay *>(this)->edict()->m_fStateFlags;
         int oldFlags = flags;
-        DETOUR_MEMBER_CALL();
+        DETOUR_MEMBER_CALL(CBaseAnimatingOverlay_StudioFrameAdvance)();
         if (reinterpret_cast<CBaseAnimatingOverlay *>(this)->IsPlayer()) flags = oldFlags | (flags & ~(FL_FULL_EDICT_CHANGED));
     }
 
@@ -1452,7 +1450,7 @@ namespace Mod::Perf::SendProp_Optimize
 	{
         auto &flags = reinterpret_cast<CBaseAnimatingOverlay *>(this)->edict()->m_fStateFlags;
         int oldFlags = flags;
-        DETOUR_MEMBER_CALL(layer, cycle);
+        DETOUR_MEMBER_CALL(CBaseAnimatingOverlay_SetLayerCycle)(layer, cycle);
         if (reinterpret_cast<CBaseAnimatingOverlay *>(this)->IsPlayer()) flags = oldFlags | (flags & ~(FL_FULL_EDICT_CHANGED));
     }
 
@@ -1461,7 +1459,7 @@ namespace Mod::Perf::SendProp_Optimize
 	{
         auto &flags = reinterpret_cast<CMultiPlayerAnimState *>(this)->m_pPlayer->edict()->m_fStateFlags;
         int oldFlags = flags;
-        DETOUR_MEMBER_CALL(iGestureSlot, iGestureActivity, bAutoKill);
+        DETOUR_MEMBER_CALL(CMultiPlayerAnimState_AddToGestureSlot)(iGestureSlot, iGestureActivity, bAutoKill);
         flags = oldFlags | (flags & ~(FL_FULL_EDICT_CHANGED));
     }
 
@@ -1469,7 +1467,7 @@ namespace Mod::Perf::SendProp_Optimize
 	{
         auto &flags = reinterpret_cast<CMultiPlayerAnimState *>(this)->m_pPlayer->edict()->m_fStateFlags;
         int oldFlags = flags;
-        DETOUR_MEMBER_CALL(iGestureSlot, iGestureActivity, bAutoKill);
+        DETOUR_MEMBER_CALL(CMultiPlayerAnimState_RestartGesture)(iGestureSlot, iGestureActivity, bAutoKill);
         flags = oldFlags | (flags & ~(FL_FULL_EDICT_CHANGED));
     }
 #endif
@@ -1483,12 +1481,12 @@ namespace Mod::Perf::SendProp_Optimize
             prop_value_old[edict->m_EdictIndex].clear();
             entity_frame_bit_size[edict->m_EdictIndex] = 0;
         }
-        DETOUR_MEMBER_CALL();
+        DETOUR_MEMBER_CALL(CBaseEntity_D2)();
     }
 
     /*DETOUR_DECL_MEMBER(int, SendTable_WriteAllDeltaProps, int iTick, int *iOutProps, int nMaxOutProps)
 	{
-		int result = DETOUR_MEMBER_CALL(iTick, iOutProps, nMaxOutProps);
+		int result = DETOUR_MEMBER_CALL(SendTable_WriteAllDeltaProps)(iTick, iOutProps, nMaxOutProps);
         if (result == -1)
             result = 0
         return result;
@@ -1507,7 +1505,7 @@ namespace Mod::Perf::SendProp_Optimize
         SCOPED_INCREMENT_IF(rc_SendTable_WriteAllDeltaProps, nObjectID != -1);
         //if (nObjectID != -1)
         //    DevMsg("F %s\n", pTable->GetName());
-        return DETOUR_STATIC_CALL(pTable, pFromData, nFromDataBits, pToData, nToDataBits, nObjectID, pBufOut);
+        return DETOUR_STATIC_CALL(SendTable_WriteAllDeltaProps)(pTable, pFromData, nFromDataBits, pToData, nToDataBits, nObjectID, pBufOut);
     }
 
     DETOUR_DECL_STATIC(IChangeFrameList*, AllocChangeFrameList, int nProperties, int iCurTick)
@@ -1520,7 +1518,7 @@ namespace Mod::Perf::SendProp_Optimize
 #ifdef SE_IS_TF2
     DETOUR_DECL_MEMBER(void, CPopulationManager_SetPopulationFilename, const char *filename)
     {
-        DETOUR_MEMBER_CALL(filename);
+        DETOUR_MEMBER_CALL(CPopulationManager_SetPopulationFilename)(filename);
         // Original function uses MAKE_STRING to set file name, which is bad
         if (TFObjectiveResource() != nullptr) {
             TFObjectiveResource()->m_iszMvMPopfileName = AllocPooledString(filename);
@@ -1559,7 +1557,7 @@ namespace Mod::Perf::SendProp_Optimize
     }
     THINK_FUNC_DECL(SetVisibleStateWeapon) {
         auto weapon = reinterpret_cast<CBaseCombatWeapon *>(this);
-        if (weapon->GetOwnerEntity() != nullptr && (!weapon->GetOwnerEntity()->IsAlive() || (weapon->GetOwnerEntity()->GetFlags() & FL_FAKECLIENT && weapon->m_iState != WEAPON_IS_ACTIVE && rtti_cast<CTFBuffItem *>(weapon) == nullptr))) {
+        if (weapon->GetOwnerEntity() != nullptr && (!weapon->GetOwnerEntity()->IsAlive() || (weapon->GetOwnerEntity()->GetFlags() & FL_FAKECLIENT && weapon->m_iState != WEAPON_IS_ACTIVE))) {
             this->edict()->m_fStateFlags |= FL_EDICT_DONTSEND;
         }
     }
@@ -1571,14 +1569,14 @@ namespace Mod::Perf::SendProp_Optimize
     DETOUR_DECL_MEMBER(void, CBasePlayer_Event_Killed, const CTakeDamageInfo& info)
 	{
 		auto player = reinterpret_cast<CBasePlayer *>(this);
-		DETOUR_MEMBER_CALL(info);
+		DETOUR_MEMBER_CALL(CBasePlayer_Event_Killed)(info);
         THINK_FUNC_SET(player,SetVisibleStateDelay, gpGlobals->curtime + 0.5f);
 	}
     
     DETOUR_DECL_MEMBER(void, CTFWeaponBase_OnActiveStateChanged, int oldState)
 	{
 		auto weapon = reinterpret_cast<CTFWeaponBase *>(this);
-		DETOUR_MEMBER_CALL(oldState);
+		DETOUR_MEMBER_CALL(CTFWeaponBase_OnActiveStateChanged)(oldState);
         int state = weapon->m_iState;
         if (state == WEAPON_IS_ACTIVE) {
             weapon->edict()->m_fStateFlags &= ~FL_EDICT_DONTSEND;
@@ -1592,7 +1590,7 @@ namespace Mod::Perf::SendProp_Optimize
     DETOUR_DECL_MEMBER(void, CBaseCombatWeapon_OnActiveStateChanged, int oldState)
 	{
 		auto weapon = reinterpret_cast<CBaseCombatWeapon *>(this);
-		DETOUR_MEMBER_CALL(oldState);
+		DETOUR_MEMBER_CALL(CBaseCombatWeapon_OnActiveStateChanged)(oldState);
         int state = weapon->m_iState;
         if (state == WEAPON_IS_ACTIVE) {
             weapon->edict()->m_fStateFlags &= ~FL_EDICT_DONTSEND;
@@ -1610,7 +1608,7 @@ namespace Mod::Perf::SendProp_Optimize
     DETOUR_DECL_MEMBER(void, CBasePlayer_Spawn)
 	{
 		auto player = reinterpret_cast<CBasePlayer *>(this);
-		DETOUR_MEMBER_CALL();
+		DETOUR_MEMBER_CALL(CBasePlayer_Spawn)();
         player->edict()->m_fStateFlags &= ~FL_EDICT_DONTSEND;
 #ifdef SE_IS_TF2
         for (int i = 0; i < player->GetNumWearables(); i++) {
@@ -1851,9 +1849,9 @@ namespace Mod::Perf::SendProp_Optimize
                     if (dataTableIndex < sendTable->m_pPrecalc->m_nDataTableProxies) {
                         serverClassCache->prop_propproxy_first[dataTableIndex] = iToProp;
                     }
-                    if ((intptr_t)pmStack.GetCurStructBase() != 0) {
+                    if ((int)pmStack.GetCurStructBase() != 0) {
 
-                        int offset = pProp->GetOffset() + (intptr_t)pmStack.GetCurStructBase() - 1;
+                        int offset = pProp->GetOffset() + (int)pmStack.GetCurStructBase() - 1;
                         
                         int elementCount = 1;
                         int elementStride = 0;
@@ -1862,11 +1860,11 @@ namespace Mod::Perf::SendProp_Optimize
                         auto arrayProp = pProp;
                         if ( pProp->GetType() == DPT_Array )
                         {
-                            offset = pProp->GetArrayProp()->GetOffset() + (intptr_t)pmStack.GetCurStructBase() - 1;
+                            offset = pProp->GetArrayProp()->GetOffset() + (int)pmStack.GetCurStructBase() - 1;
                             elementCount = pProp->m_nElements;
                             elementStride = pProp->m_ElementStride;
                             pProp = pProp->GetArrayProp();
-                            offsetToUse = (intptr_t)pmStack.GetCurStructBase() - 1;
+                            offsetToUse = (int)pmStack.GetCurStructBase() - 1;
                         }
 
                         serverClassCache->prop_offsets[propIdToUse] = offsetToUse;
@@ -2029,7 +2027,6 @@ namespace Mod::Perf::SendProp_Optimize
 		virtual void LevelInitPostEntity() override
 		{
             world_edict = INDEXENT(0);
-            auto world_accessor2 = engine->GetChangeAccessor(world_edict);
             world_accessor = static_cast<CVEngineServer *>(engine)->GetChangeAccessorStatic(world_edict);
             world_change_info = &g_SharedEdictChangeInfo->m_ChangeInfos[0];
             

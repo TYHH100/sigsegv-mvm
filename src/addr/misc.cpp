@@ -7,7 +7,7 @@
 #include "addr/standard.h"
 //#include "disasm/disasm.h"
 
-#ifdef _WINDOWS
+
 static constexpr uint8_t s_Buf_g_pGameRules[] = {
 	0x55,                                                       // +0000  push ebp
 	0x8b, 0xec,                                                 // +0001  mov ebp,esp
@@ -47,9 +47,6 @@ struct CExtract_g_pGameRules : public IExtract<uintptr_t>
 	static constexpr int VT_idx_CBaseGameSystemPerFrame_dtor = 0x00d;
 };
 
-#else
-using CExtract_g_pGameRules = IExtractStub;
-#endif
 
 class CAddr_g_pGameRules : public IAddr_Sym
 {
@@ -59,13 +56,11 @@ public:
 	
 	virtual bool FindAddrWin(uintptr_t& addr) const override
 	{
-#ifdef _WINDOWS
 		CExtract_g_pGameRules extractor;
 		if (!extractor.Init())  return false;
 		if (!extractor.Check()) return false;
 		
 		addr = extractor.Extract();
-#endif
 		return true;
 	}
 };
@@ -80,7 +75,6 @@ public:
 	
 	virtual bool FindAddrWin(uintptr_t& addr) const override
 	{
-#ifdef _WINDOWS
 		using StrScanner = CStringScanner<ScanDir::FORWARD, ScanResults::ALL, 1>;
 		using ArrScanner = CMaskedScanner<ScanDir::FORWARD, ScanResults::ALL, 4>;
 		
@@ -127,7 +121,6 @@ public:
 		if (match[9][0] != '\0') { DevMsg("Fail nullstr9\n"); return false; }
 		
 		addr = (uintptr_t)match;
-#endif
 		return true;
 	}
 };
@@ -142,7 +135,6 @@ public:
 	
 	virtual bool FindAddrWin(uintptr_t& addr) const override
 	{
-#ifdef _WINDOWS
 		using FuncScanner = CMaskedScanner<ScanDir::FORWARD, ScanResults::ALL, 0x10>;
 		
 		static constexpr uint8_t buf[] = {
@@ -197,7 +189,6 @@ public:
 		}
 		
 		addr = (uintptr_t)scan1.FirstMatch();
-#endif
 		return true;
 	}
 };
@@ -383,7 +374,6 @@ class IAddr_Func_EBPPrologue_UniqueCall : public IAddr_Sym
 public:
 	virtual bool FindAddrWin(uintptr_t& addr) const override
 	{
-#ifdef _WINDOWS
 		using CallScanner = CCallScanner<ScanDir::FORWARD, ScanResults::ALL, 1>;
 		
 		auto p_ref = AddrManager::GetAddr(this->GetUniqueFuncName());
@@ -406,7 +396,6 @@ public:
 		}
 		
 		addr = (uintptr_t)p_func;
-#endif
 		return true;
 	}
 	
@@ -492,7 +481,6 @@ public:
 	
 	virtual bool FindAddrWin(uintptr_t& addr) const override
 	{
-#ifdef _WINDOWS
 		using MyScanner = CMaskedScanner<ScanDir::FORWARD, ScanResults::ALL, 1>;
 		
 		const char *p_str = Scan::FindUniqueConstStr(this->GetLibrary(), "MVMWaveFailed");
@@ -524,7 +512,6 @@ public:
 		}
 		
 		addr = *(uintptr_t *)((uintptr_t)scan1.FirstMatch() + 0x02);
-#endif
 		return true;
 	}
 };
@@ -544,7 +531,6 @@ public:
 	
 	virtual bool FindAddrWin(uintptr_t& addr) const override
 	{
-#ifdef _WINDOWS
 		using MyScanner = CMaskedScanner<ScanDir::FORWARD, ScanResults::ALL, 1>;
 		
 		const char *p_str = Scan::FindUniqueConstStr(this->GetLibrary(), "MVMWaveFailed");
@@ -577,7 +563,6 @@ public:
 		
 		auto match = (uintptr_t)scan1.FirstMatch() + 0x0e;
 		addr = *(uintptr_t *)match + (match + 4);
-#endif
 		return true;
 	}
 };
@@ -597,7 +582,6 @@ public:
 	
 	virtual bool FindAddrWin(uintptr_t& addr) const override
 	{
-#ifdef _WINDOWS
 		using MyScanner = CMaskedScanner<ScanDir::FORWARD, ScanResults::ALL, 1>;
 		
 		const char *p_str = Scan::FindUniqueConstStr(this->GetLibrary(), "MVMWaveFailed");
@@ -631,7 +615,6 @@ public:
 		
 		auto match = (uintptr_t)scan1.FirstMatch() + 0x11;
 		addr = *(uintptr_t *)match + (match + 4);
-#endif
 		return true;
 	}
 };
@@ -644,7 +627,6 @@ class IAddr_Client_CDebugOverlay : public IAddr_Sym
 public:
 	virtual bool FindAddrWin(uintptr_t& addr) const override
 	{
-#ifdef _WINDOWS
 		using StrRefScanner        = CTypeScanner  <ScanDir::FORWARD, ScanResults::ALL, const char *>;
 		using NearbyPatternScanner = CMaskedScanner<ScanDir::FORWARD, ScanResults::ALL, 1>;
 		
@@ -686,7 +668,6 @@ public:
 		}
 		
 		addr = (uintptr_t)matches[0];
-#endif
 		return true;
 	}
 	
@@ -903,7 +884,6 @@ public:
 	
 	virtual bool FindAddrWin(uintptr_t& addr) const override
 	{
-#ifdef _WINDOWS
 		using MyScanner = CMaskedScanner<ScanDir::FORWARD, ScanResults::ALL, 1>;
 		
 		void *p_func = AddrManager::GetAddr("[client] CTFModeManager::LevelInit");
@@ -937,7 +917,6 @@ public:
 		}
 		
 		addr = **(uintptr_t **)((uintptr_t)scan1.FirstMatch() + 0x05);
-#endif
 		return true;
 	}
 };
@@ -957,7 +936,6 @@ public:
 	
 	virtual bool FindAddrWin(uintptr_t& addr)
 	{
-#ifdef _WINDOWS
 		void *p_func = AddrManager::GetAddr("CVideoMode_Common::TakeSnapshotTGA");
 		if (p_func == nullptr) {
 			DevMsg("CAddr_TGAWriter_WriteToBuffer: \"%s\": failed to find parent function\n", this->GetName());
@@ -984,7 +962,6 @@ public:
 		for ()*/
 		
 		// REMOVE ME
-#endif
 		return false;
 	}
 };
@@ -999,7 +976,6 @@ public:
 	
 	virtual bool FindAddrWin(uintptr_t& addr) const override
 	{
-#ifdef _WINDOWS
 		using StrRefScanner = CAlignedTypeScanner<ScanDir::FORWARD, ScanResults::ALL, const char *>;
 		
 		constexpr char str[] = "TF_COND_AIMING";
@@ -1016,7 +992,6 @@ public:
 		}
 		
 		addr = (uintptr_t)scan1.FirstMatch();
-#endif
 		return true;
 	}
 };

@@ -25,7 +25,7 @@ namespace Mod::Credits::Spawn_AutoCollect
 	{
 		auto pack = reinterpret_cast<CCurrencyPack *>(this);
 		
-		DETOUR_MEMBER_CALL();
+		DETOUR_MEMBER_CALL(CCurrencyPack_ComeToRest)();
 		
 		if (!pack->IsMarkedForDeletion() && !pack->IsBeingPulled() && !pack->IsDistributed()) {
 			int credit_team = GetCreditTeamNum();

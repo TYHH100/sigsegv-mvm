@@ -1075,7 +1075,7 @@ namespace Mod::Util::Overlay_Recv
 		ReceivePackets();
 		ProcessQueuedPackets();
 		
-		DETOUR_STATIC_CALL();
+		DETOUR_STATIC_CALL(CDebugOverlay_DrawAllOverlays)();
 		
 #if 0
 		static std::vector<uint8_t> packet;

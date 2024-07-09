@@ -68,7 +68,7 @@ private:
 	bool m_bSightedIn;                 // +0x91
 	IntervalTimer m_itHeadSteady;      // +0x94
 	QAngle m_angLastEyeAngles;         // +0x98
-	QAngle m_someAngle;
+	// 0xa4-af: an unused Vector/QAngle perhaps
 	CountdownTimer m_ctResettle;       // +0xb0
 	Vector m_vecLastEyeVectors;        // +0xbc
 };

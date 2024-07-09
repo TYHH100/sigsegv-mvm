@@ -185,22 +185,6 @@ namespace Mod::Perf::Virtual_Call_Optimize
 
 
     constexpr uint8_t s_Buf_CStaticPropMgr_IsStaticProp[] = {
-        // return !pHandleEntity || (size_t)(*pHandleEntity) == 0x44444444(44444444);
-#ifdef PLATFORM_64BITS
-        // mov     eax, 1
-        // test    rsi, rsi
-        // je      .L1
-        // movabs  rax, 4919131752989213764
-        // cmp     QWORD PTR [rsi], rax
-        // sete    al
-        // .L1:
-        // ret
-
-        0xb8, 0x01, 0x00, 0x00, 0x00, 0x48, 0x85, 0xf6, 
-        0x74, 0x10, 0x48, 0xb8, 0x44, 0x44, 0x44, 0x44, 
-        0x44, 0x44, 0x44, 0x44, 0x48, 0x39, 0x06, 0x0f, 
-        0x94, 0xc0, 0xc3, 
-#else
         0x52,
         0x8b, 0x54, 0x24, 0x0c,             //mov    edx,DWORD PTR [esp+0x8 + 0x04] 1
         0xb8, 0x01, 0x00, 0x00, 0x00,          //mov    eax,0x1 5
@@ -211,7 +195,6 @@ namespace Mod::Perf::Virtual_Call_Optimize
         // 00000017 <L1>:
         0x5a,
         0xc3                      //ret
-#endif
 	};
         
     struct CPatch_CStaticPropMgr_IsStaticProp : public CPatch
@@ -224,6 +207,12 @@ namespace Mod::Perf::Virtual_Call_Optimize
 		
 		virtual bool GetVerifyInfo(ByteBuf& buf, ByteBuf& mask) const override
 		{
+            // auto addr = (uint8_t *)AddrManager::GetAddr("CEconItemView::GetStaticData");
+            // Msg("Pre enable:");
+            // for (int i = 0; i<48;i++) {
+            //     Msg(" %02hhX", *(addr+i));
+            // }
+            // Msg("\n");
 			buf.CopyFrom(s_Buf_CStaticPropMgr_IsStaticProp);
 			
 			mask.SetAll(0x00);
@@ -233,11 +222,7 @@ namespace Mod::Perf::Virtual_Call_Optimize
 		
 		virtual bool GetPatchInfo(ByteBuf& buf, ByteBuf& mask) const override
 		{
-#ifdef PLATFORM_64BITS
-            buf.SetQword(0xc, (uintptr_t)RTTI::GetVTable("11CStaticProp"));
-#else
             buf.SetDword(0xe + 2, (uintptr_t)RTTI::GetVTable("11CStaticProp"));
-#endif
 			mask.SetAll(0xFF);
 			
 			return true;
@@ -245,36 +230,12 @@ namespace Mod::Perf::Virtual_Call_Optimize
 		
 		virtual bool AdjustPatchInfo(ByteBuf& buf) const override
 		{
-#ifdef PLATFORM_64BITS
-            buf.SetQword(0xc, (uintptr_t)RTTI::GetVTable("11CStaticProp"));
-#else
             buf.SetDword(0xe + 2, (uintptr_t)RTTI::GetVTable("11CStaticProp"));
-#endif
 			return true;
 		}
 	};
 
     constexpr uint8_t s_Buf_CStaticPropMgr_GetStaticProp[] = {
-        // if (!pHandleEntity) return nullptr;
-        // if ((size_t)(*pHandleEntity) != 0x44444444(44444444)) return nullptr;
-        // return pHandleEntity+2;
-#ifdef PLATFORM_64BITS
-        // xor     eax, eax
-        // test    rsi, rsi
-        // je      .L6
-        // movabs  rdx, 4919131752989213764
-        // cmp     QWORD PTR [rsi], rdx
-        // jne     .L6
-        // lea     rax, [rsi+16]
-        // ret
-        // .L6:
-        // ret
-
-        0x31, 0xc0, 0x48, 0x85, 0xf6, 0x74, 0x14, 0x48, 
-        0xba, 0x44, 0x44, 0x44, 0x44, 0x44, 0x44, 0x44, 
-        0x44, 0x48, 0x39, 0x16, 0x75, 0x05, 0x48, 0x8d, 
-        0x46, 0x10, 0xc3, 0xc3, 
-#else
         0x52,
         0x8b, 0x44, 0x24, 0x0c,       //      mov    eax,DWORD PTR [esp+0x8 + 0x4]
         0x31, 0xd2,                   //xor    edx,edx
@@ -287,7 +248,6 @@ namespace Mod::Perf::Virtual_Call_Optimize
         0x89, 0xd0,                  // mov    eax,edx
         0x5a,
         0xc3,                      //ret
-#endif
 	};
         
     struct CPatch_CStaticPropMgr_GetStaticProp : public CPatch
@@ -315,11 +275,7 @@ namespace Mod::Perf::Virtual_Call_Optimize
 		
 		virtual bool GetPatchInfo(ByteBuf& buf, ByteBuf& mask) const override
 		{
-#ifdef PLATFORM_64BITS
-            buf.SetQword(0x9, (uintptr_t)RTTI::GetVTable("11CStaticProp"));
-#else
             buf.SetDword(0xb + 2, (uintptr_t)RTTI::GetVTable("11CStaticProp"));
-#endif
 			mask.SetAll(0xFF);
 			
 			return true;
@@ -327,11 +283,7 @@ namespace Mod::Perf::Virtual_Call_Optimize
 		
 		virtual bool AdjustPatchInfo(ByteBuf& buf) const override
 		{
-#ifdef PLATFORM_64BITS
-            buf.SetQword(0x9, (uintptr_t)RTTI::GetVTable("11CStaticProp"));
-#else
             buf.SetDword(0xb + 2, (uintptr_t)RTTI::GetVTable("11CStaticProp"));
-#endif
 			return true;
 		}
 	};
@@ -695,7 +647,7 @@ namespace Mod::Perf::Virtual_Call_Optimize
     }
     DETOUR_DECL_MEMBER(void *, CBaseEntity_GetNetworkable)
 	{
-        void *result = DETOUR_MEMBER_CALL();
+        void *result = DETOUR_MEMBER_CALL(CBaseEntity_GetNetworkable)();
         auto addr = (uint8_t*)__builtin_return_address(0);
         if (addr[-3] == 0xFF && addr[-1] == 0x14) {
             static const uintptr_t offset = (uintptr_t) result - (uintptr_t)this;
@@ -705,7 +657,7 @@ namespace Mod::Perf::Virtual_Call_Optimize
     }
     DETOUR_DECL_MEMBER(void *, CBaseEntity_GetCollideable)
 	{
-        void *result = DETOUR_MEMBER_CALL();
+        void *result = DETOUR_MEMBER_CALL(CBaseEntity_GetCollideable)();
         auto addr = (uint8_t*)__builtin_return_address(0);
         if (addr[-3] == 0xFF && addr[-1] == 0x10) {
             static const uintptr_t offset = (uintptr_t) result - (uintptr_t)this;
@@ -715,7 +667,7 @@ namespace Mod::Perf::Virtual_Call_Optimize
     }
     DETOUR_DECL_MEMBER(void *, CBaseEntity_GetRefEHandle)
 	{
-        void *result = DETOUR_MEMBER_CALL();
+        void *result = DETOUR_MEMBER_CALL(CBaseEntity_GetRefEHandle)();
         auto addr = (uint8_t*)__builtin_return_address(0);
         if (addr[-3] == 0xFF && addr[-1] == 0x0c) {
             static const uintptr_t offset = (uintptr_t) result - (uintptr_t)this;
@@ -731,7 +683,7 @@ namespace Mod::Perf::Virtual_Call_Optimize
         if (addr[-3] == 0xFF && addr[-1] == 0x08) {
             OptimizeVirtual(addr, 0x08, 0, 0x0C);
         }
-        return DETOUR_MEMBER_CALL();
+        return DETOUR_MEMBER_CALL(CServerNetworkProperty_GetEdict)();
     }
     DETOUR_DECL_MEMBER(void *, CServerNetworkProperty_GetEntityHandle)
 	{
@@ -740,12 +692,12 @@ namespace Mod::Perf::Virtual_Call_Optimize
         if (addr[-3] == 0xFF && addr[-1] == 0x00) {
             OptimizeVirtual(addr, 0x00, 0, 0x08);
         }
-        return DETOUR_MEMBER_CALL();
+        return DETOUR_MEMBER_CALL(CServerNetworkProperty_GetEntityHandle)();
     }
     DETOUR_DECL_MEMBER(void *, CServerNetworkProperty_GetServerClass)
 	{
         //Not optimizable
-        return DETOUR_MEMBER_CALL();
+        return DETOUR_MEMBER_CALL(CServerNetworkProperty_GetServerClass)();
     }
     DETOUR_DECL_MEMBER(void *, CServerNetworkProperty_GetBaseEntity)
 	{
@@ -753,21 +705,21 @@ namespace Mod::Perf::Virtual_Call_Optimize
         if (addr[-3] == 0xFF && addr[-1] == 0x1c) {
             OptimizeVirtual(addr, 0x1c, 0, 0x08);
         }
-        return DETOUR_MEMBER_CALL();
+        return DETOUR_MEMBER_CALL(CServerNetworkProperty_GetBaseEntity)();
     }
-    CProp_DataMap prop_classname("CBaseEntity", "m_iClassname", nullptr);
+    CProp_DataMap prop_classname("CBaseEntity", "m_iClassname");
     DETOUR_DECL_MEMBER(void *, CServerNetworkProperty_GetClassName)
 	{
         auto addr = (uint8_t*)__builtin_return_address(0);
         if (addr[-3] == 0xFF && addr[-1] == 0x0c) {
             OptimizeVirtual(addr, 0x0c, 0, 0x08, prop_classname.GetOffsetDirect());
         }
-        return DETOUR_MEMBER_CALL();
+        return DETOUR_MEMBER_CALL(CServerNetworkProperty_GetClassName)();
     }
     DETOUR_DECL_MEMBER(void *, CServerNetworkProperty_GetPVSInfo)
 	{
         
-        void *result = DETOUR_MEMBER_CALL();
+        void *result = DETOUR_MEMBER_CALL(CServerNetworkProperty_GetPVSInfo)();
         
         auto addr = (uint8_t*)__builtin_return_address(0);
         if (addr[-3] == 0xFF && addr[-1] == 0x20) {
@@ -778,33 +730,33 @@ namespace Mod::Perf::Virtual_Call_Optimize
 
         return result;
     }
-    CProp_SendProp prop_model_index("CBaseEntity", "m_nModelIndex", nullptr, "CBaseEntity", nullptr);
+    CProp_SendProp prop_model_index("CBaseEntity", "m_nModelIndex", "CBaseEntity", nullptr);
     DETOUR_DECL_MEMBER(void *, CBaseEntity_GetModelIndex)
 	{
         auto addr = (uint8_t*)__builtin_return_address(0);
         if (addr[-3] == 0xFF && addr[-1] == 0x1c) {
             OptimizeVirtual(addr, 0x1C, 0, prop_model_index.GetOffsetDirect(), INT_MIN, DEREF_SHORT);
         }
-        return DETOUR_MEMBER_CALL();
+        return DETOUR_MEMBER_CALL(CBaseEntity_GetModelIndex)();
     }
     
     DETOUR_DECL_MEMBER(void *, CCollisionProperty_GetEntityHandle)
 	{
         OptimizeVirtual((uint8_t*)__builtin_return_address(0), 0x00, 0, 0x04);
-        void *result = DETOUR_MEMBER_CALL();
+        void *result = DETOUR_MEMBER_CALL(CCollisionProperty_GetEntityHandle)();
         return result;
     }
 
     DETOUR_DECL_MEMBER(int, CCollisionProperty_GetSolid)
 	{
         OptimizeVirtual((uint8_t*)__builtin_return_address(0), 0x34, 0, 0x41, INT_MIN, DEREF_BYTE);
-        return DETOUR_MEMBER_CALL();
+        return DETOUR_MEMBER_CALL(CCollisionProperty_GetSolid)();
     }
 
     DETOUR_DECL_MEMBER(int, CCollisionProperty_GetSolidFlags)
 	{
         OptimizeVirtual((uint8_t*)__builtin_return_address(0), 0x38, 0, 0x3c, INT_MIN, DEREF_SHORT);
-        return DETOUR_MEMBER_CALL();
+        return DETOUR_MEMBER_CALL(CCollisionProperty_GetSolidFlags)();
     }
 
 
@@ -867,19 +819,15 @@ namespace Mod::Perf::Virtual_Call_Optimize
             // Rewrite those functions with assumption that an entity handle is static prop if vtable is of static prop
             this->AddPatch(new CPatch_CStaticPropMgr_IsStaticProp());
             this->AddPatch(new CPatch_CStaticPropMgr_GetStaticProp());
-//          this->AddPatch(new CPatch_CStaticPropMgr_GetStaticPropIndex());
+            this->AddPatch(new CPatch_CStaticPropMgr_GetStaticPropIndex());
             
             // this->AddPatch(new CPatch_CStaticProp_GetEntityHandle());
             // this->AddPatch(new CPatch_CStaticProp_GetRefEHandle());
             
             // Rewrite those functions but with less instructions (no prologue) therefore faster
-#ifndef SE_IS_TF2
             this->AddPatch(new CPatch_CBasePlayer_IsPlayer());
-#endif
             //this->AddPatch(new CPatch_CBaseEntity_GetBaseEntity());
-#ifndef PLATFORM_64BITS
             this->AddPatch(new CPatch_CBaseEntity_GetTeamNumber());
-#endif
             
 #ifdef SE_IS_TF2
             // Automatically assume that IsBotOfType is asking for bots of type 1337 (CTFBot)

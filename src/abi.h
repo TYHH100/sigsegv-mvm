@@ -102,7 +102,7 @@ extern "C" PVOID __CLRCALL_OR_CDECL __RTDynamicCast (
 #endif
 
 /* use EAX/EDX/ECX register calling convention in GCC build ONLY */
-#if defined __GNUC__ && !defined __clang__ && !defined PLATFORM_64BITS
+#if defined __GNUC__ && !defined __clang__
 #define __gcc_regcall [[gnu::regparm(3)]] [[gnu::sseregparm]]
 #else
 #define __gcc_regcall
@@ -123,11 +123,6 @@ template<class C, typename RET, typename... PARAMS> using MemberPtrTypeConst = R
 
 template<class C, typename RET, typename... PARAMS> using MemberPtrTypeVa      = RET (C::*)(PARAMS..., ...);
 template<class C, typename RET, typename... PARAMS> using MemberPtrTypeVaConst = RET (C::*)(PARAMS..., ...) const;
-
-#if defined __GNUC__ && !defined __clang__ && !defined PLATFORM_64BITS
-template<class C, typename RET, typename... PARAMS> using MemberPtrTypeRegcall      = RET (C::*)(PARAMS...) __gcc_regcall;
-template<class C, typename RET, typename... PARAMS> using MemberPtrTypeConstRegcall = RET (C::*)(PARAMS...) const __gcc_regcall;
-#endif
 
 #if defined __clang__
 
@@ -188,13 +183,7 @@ inline void *GetAddrOfMemberFunc(MemberPtrTypeVaConst<C, RET, PARAMS...> ptr)
 {
 	return GetAddrOfMemberFunc(reinterpret_cast<MemberPtrType<C, RET, PARAMS...>>(ptr));
 }
-#if defined __GNUC__ && !defined __clang__ && !defined PLATFORM_64BITS
-template<class C, typename RET, typename... PARAMS>
-inline void *GetAddrOfMemberFunc(MemberPtrTypeRegcall<C, RET, PARAMS...> ptr)
-{
-	return GetAddrOfMemberFunc(reinterpret_cast<MemberPtrType<C, RET, PARAMS...>>(ptr));
-}
-#endif
+
 
 template<class C, typename RET, typename... PARAMS>
 int GetVIdxOfMemberFunc(MemberPtrType<C, RET, PARAMS...> ptr)
@@ -203,8 +192,8 @@ int GetVIdxOfMemberFunc(MemberPtrType<C, RET, PARAMS...> ptr)
 	
 	u.fptr = ptr;
 	
-	assert((uintptr_t)u.guts.ptr % sizeof(void *) == 1);
-	return ((intptr_t)u.guts.ptr - 1) / sizeof(void *);
+	assert((uintptr_t)u.guts.ptr % 4 == 1);
+	return ((int)u.guts.ptr - 1) / 4;
 }
 template<class C, typename RET, typename... PARAMS>
 int GetVIdxOfMemberFunc(MemberPtrTypeVa<C, RET, PARAMS...> ptr)

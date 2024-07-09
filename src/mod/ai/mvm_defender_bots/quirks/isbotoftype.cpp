@@ -21,7 +21,7 @@ namespace Mod::AI::MvM_Defender_Bots
 		}
 		
 		return 1337;
-	//	return DETOUR_MEMBER_CALL();
+	//	return DETOUR_MEMBER_CALL(CTFBot_GetBotType)();
 	}
 	
 	

@@ -34,6 +34,7 @@
                 "HAVE_STDINT_H",
                 "HAVE_STRING_H",
                 "GNUC",
+                "PLATFORM_X86",
                 "FMT_HEADER_ONLY",
                 "LINUX",
                 "POSIX",
@@ -46,15 +47,14 @@
                 "T_HEADER_ONLY",
                 "_LINUX",
                 "VERSION_SAFE_STEAM_API_INTERFACES",
-                "LUAJIT_ENABLE_LUA52COMPAT",
-                "__cplusplus"
+                "LUAJIT_ENABLE_LUA52COMPAT"
             ],
             "compilerPath": "/usr/bin/gcc",
             "cStandard": "c17",
-            "cppStandard": "gnu++20",
+            "cppStandard": "c++20",
             "intelliSenseMode": "linux-gcc-x86",
             "compilerArgs": [
-                "-m64"
+                "-m32"
             ],
             "forcedInclude": [
                 "${workspaceFolder}/src/common.h"

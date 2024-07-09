@@ -16,7 +16,7 @@ namespace Mod::MvM::Chat_Unrestrict
 			}
 		}
 		
-		return DETOUR_MEMBER_CALL(them);
+		return DETOUR_MEMBER_CALL(CTFPlayer_CanHearAndReadChatFrom)(them);
 	}
 	
 	

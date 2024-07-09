@@ -40,7 +40,7 @@ jobs:
         cd alliedmodders
         git clone --recursive https://github.com/alliedmodders/sourcemod --depth 1 -b 1.11-dev
         git clone https://github.com/alliedmodders/hl2sdk --depth 1 -b sdk2013 hl2sdk-sdk2013
-        git clone https://github.com/rafradek/hl2sdk-tf2 --depth 1 -b tf2-fixcpudef hl2sdk-tf2
+        git clone https://github.com/TF2-DMB/hl2sdk-tf2.git --depth 1 hl2sdk-tf2
         git clone https://github.com/alliedmodders/hl2sdk --depth 1 -b css hl2sdk-css
         git clone https://github.com/alliedmodders/metamod-source --depth 1 -b 1.11-dev
         popd
@@ -49,12 +49,8 @@ jobs:
       run: |
         pushd libs/udis86
         ./autogen.sh
-        ./configure --enable-static=yes
-        make CFLAGS="-m32" LDFLAGS="-m32"
-        mv libudis86/.libs/libudis86.a ../libudis86.a
-        make clean
-        make CFLAGS="-fPIC"
-        mv libudis86/.libs/libudis86.a ../libudis86x64.a
+        ./configure
+        make
         popd
 
     - name: Build Lua
@@ -66,10 +62,6 @@ jobs:
         mv lua-* lua
         cd lua
         make MYCFLAGS='-m32' MYLDFLAGS='-m32'
-        mv src/liblua.a ../liblua.a
-        make clean
-        make MYCFLAGS='-fPIC'
-        mv src/liblua.a ../libluax64.a
         popd
 
     - name: Configure

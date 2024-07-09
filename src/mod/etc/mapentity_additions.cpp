@@ -395,7 +395,7 @@ namespace Mod::Etc::Mapentity_Additions
             EntityOutputPrintDebug(reinterpret_cast<CBaseEntityOutput *>(this), Value, pActivator, pCaller, fDelay);
         }
 
-        DETOUR_MEMBER_CALL(Value, pActivator, pCaller, fDelay);
+        DETOUR_MEMBER_CALL(CBaseEntityOutput_FireOutput)(Value, pActivator, pCaller, fDelay);
     }
 
 	DETOUR_DECL_MEMBER(bool, CBaseEntity_AcceptInput, const char *szInputName, CBaseEntity *pActivator, CBaseEntity *pCaller, variant_t Value, int outputID)
@@ -419,7 +419,7 @@ namespace Mod::Etc::Mapentity_Additions
         if (!message_listeners_empty) {
             SendMessageToListeners("(%0.2f) input %s: %s.%s(%s)\n", gpGlobals->curtime, pCaller != nullptr ? STRING(pCaller->GetEntityName()) : "<no caller>", ent->GetEntityName(), szInputName, Value.String());
         }
-        auto ret = DETOUR_MEMBER_CALL(szInputName, pActivator, pCaller, Value, outputID);
+        auto ret = DETOUR_MEMBER_CALL(CBaseEntity_AcceptInput)(szInputName, pActivator, pCaller, Value, outputID);
         
         if (!ret && !message_listeners_empty) {
             SendMessageToListeners("unhandled input: (%s) -> (%s,%s)\n", szInputName, ent->GetClassname(), STRING(ent->GetEntityName())/*,", from (%s,%s)" STRING(pCaller->m_iClassname), STRING(pCaller->m_iName)*/ );
@@ -442,7 +442,7 @@ namespace Mod::Etc::Mapentity_Additions
 
     DETOUR_DECL_MEMBER(void, CTFGameRules_CleanUpMap)
 	{
-		DETOUR_MEMBER_CALL();
+		DETOUR_MEMBER_CALL(CTFGameRules_CleanUpMap)();
         ActivateLoadedInput();
 	}
 
@@ -573,7 +573,7 @@ namespace Mod::Etc::Mapentity_Additions
                         realname += 1;
                         while (true) {
                             pStartEntity = functor(pStartEntity, realname); 
-                            if (pStartEntity != nullptr && !((Vector &)pStartEntity->GetAbsOrigin()).WithinAABox(min, max)) {
+                            if (pStartEntity != nullptr && !pStartEntity->GetAbsOrigin().WithinAABox(min, max)) {
                                 continue;
                             }
                             else {
@@ -604,7 +604,7 @@ namespace Mod::Etc::Mapentity_Additions
 
         if (szName[0] == '@' && !rc_SpecialParsedNameFail) return DoSpecialParsing(szName, pStartEntity, [&](CBaseEntity *entity, const char *realname) {return entList->FindEntityByClassname(entity, realname, filter);});
 
-        if (!cvar_fast_lookup.GetBool()) return DETOUR_MEMBER_CALL(pStartEntity, szName, filter);
+        if (!cvar_fast_lookup.GetBool()) return DETOUR_MEMBER_CALL(CGlobalEntityList_FindEntityByClassname)(pStartEntity, szName, filter);
 
         string_t lowercaseStr;
         if (last_entity_name == szName) {
@@ -660,7 +660,7 @@ namespace Mod::Etc::Mapentity_Additions
 
         if (szName[0] == '@' && !rc_SpecialParsedNameFail) return DoSpecialParsing(szName, pStartEntity, [&](CBaseEntity *entity, const char *realname) {return servertools->FindEntityByName(entity, realname, pSearchingEntity, pActivator, pCaller, pFilter);});
 
-        if (szName[0] == '!' || !cvar_fast_lookup.GetBool()) return DETOUR_MEMBER_CALL(pStartEntity, szName, pSearchingEntity, pActivator, pCaller, pFilter);
+        if (szName[0] == '!' || !cvar_fast_lookup.GetBool()) return DETOUR_MEMBER_CALL(CGlobalEntityList_FindEntityByName)(pStartEntity, szName, pSearchingEntity, pActivator, pCaller, pFilter);
         
         auto entList = reinterpret_cast<CBaseEntityList *>(this);
 
@@ -717,18 +717,14 @@ namespace Mod::Etc::Mapentity_Additions
         return nullptr;
 	}
 
-    DETOUR_DECL_MEMBER(void, CTFMedigunShield_UpdateShieldPosition)
-	{   
-		DETOUR_MEMBER_CALL();
-	}
-
-    DETOUR_DECL_MEMBER(void, CTFMedigunShield_ShieldThink)
+    DETOUR_DECL_MEMBER(void, CTFMedigunShield_RemoveShield)
 	{
         CTFMedigunShield *shield = reinterpret_cast<CTFMedigunShield *>(this);
         int spawnflags = shield->m_spawnflags;
         //DevMsg("ShieldRemove %d f\n", spawnflags);
         
         if (spawnflags & 2) {
+            DevMsg("Spawnflags is 3\n");
             shield->SetModel("models/props_mvm/mvm_player_shield2.mdl");
         }
 
@@ -740,21 +736,34 @@ namespace Mod::Etc::Mapentity_Additions
             shield->SetBlocksLOS(false);
             return;
         }
-		DETOUR_MEMBER_CALL();
+
+        
+		DETOUR_MEMBER_CALL(CTFMedigunShield_RemoveShield)();
+	}
+
+    DETOUR_DECL_MEMBER(void, CTFMedigunShield_UpdateShieldPosition)
+	{   
+		DETOUR_MEMBER_CALL(CTFMedigunShield_UpdateShieldPosition)();
+	}
+
+    DETOUR_DECL_MEMBER(void, CTFMedigunShield_ShieldThink)
+	{
+        
+		DETOUR_MEMBER_CALL(CTFMedigunShield_ShieldThink)();
 	}
     
     RefCount rc_CTriggerHurt_HurtEntity;
     DETOUR_DECL_MEMBER_CALL_CONVENTION(__gcc_regcall, bool, CTriggerHurt_HurtEntity, CBaseEntity *other, float damage)
 	{
         SCOPED_INCREMENT(rc_CTriggerHurt_HurtEntity);
-		return DETOUR_MEMBER_CALL(other, damage);
+		return DETOUR_MEMBER_CALL(CTriggerHurt_HurtEntity)(other, damage);
 	}
 
     RefCount rc_CTriggerIgnite_BurnEntities;
     DETOUR_DECL_MEMBER_CALL_CONVENTION(__gcc_regcall, int, CTriggerIgnite_BurnEntities)
 	{
         SCOPED_INCREMENT(rc_CTriggerIgnite_BurnEntities);
-		return DETOUR_MEMBER_CALL();
+		return DETOUR_MEMBER_CALL(CTriggerIgnite_BurnEntities)();
 	}
 
     CTFPlayer *selfburn_replace = nullptr;
@@ -762,7 +771,7 @@ namespace Mod::Etc::Mapentity_Additions
 	{
         auto me = reinterpret_cast<CTriggerIgnite *>(this);
         selfburn_replace = ToTFPlayer(me->GetOwnerEntity());
-		DETOUR_MEMBER_CALL(other);
+		DETOUR_MEMBER_CALL(CTriggerIgnite_IgniteEntity)(other);
         selfburn_replace = nullptr;
         if (me->GetOwnerEntity() != nullptr && other->IsPlayer()) {
         }
@@ -774,7 +783,7 @@ namespace Mod::Etc::Mapentity_Additions
             reinterpret_cast<CTFPlayerShared *>(this)->Burn(selfburn_replace, nullptr, duration);
             return;
         }
-        DETOUR_MEMBER_CALL(duration);
+        DETOUR_MEMBER_CALL(CTFPlayerShared_SelfBurn)(duration);
     }
     
     RefCount rc_CBaseEntity_TakeDamage;
@@ -792,7 +801,7 @@ namespace Mod::Etc::Mapentity_Additions
         CBaseEntity *entity = reinterpret_cast<CBaseEntity *>(this);
         bool alive = entity->IsAlive();
         int health_pre = entity->GetHealth();
-		auto damage = DETOUR_MEMBER_CALL(info);
+		auto damage = DETOUR_MEMBER_CALL(CBaseEntity_TakeDamage)(info);
         if (damage != 0 && health_pre - entity->GetHealth() != 0) {
             variant_t variant;
             variant.SetInt(health_pre - entity->GetHealth());
@@ -809,7 +818,7 @@ namespace Mod::Etc::Mapentity_Additions
     DETOUR_DECL_MEMBER(void, CBaseEntity_Event_Killed, CTakeDamageInfo &info)
 	{
         CBaseEntity *entity = reinterpret_cast<CBaseEntity *>(this);
-		DETOUR_MEMBER_CALL(info);
+		DETOUR_MEMBER_CALL(CBaseEntity_Event_Killed)(info);
         
         variant_t variant;
         variant.SetInt(info.GetDamage());
@@ -820,12 +829,12 @@ namespace Mod::Etc::Mapentity_Additions
 	{
 
         info.SetDamage(-100);
-        return DETOUR_MEMBER_CALL(info);
+        return DETOUR_MEMBER_CALL(CBaseCombatCharacter_OnTakeDamage)(info);
     }
 
     DETOUR_DECL_MEMBER(void, CBaseObject_InitializeMapPlacedObject)
 	{
-        DETOUR_MEMBER_CALL();
+        DETOUR_MEMBER_CALL(CBaseObject_InitializeMapPlacedObject)();
     
         auto sentry = reinterpret_cast<CBaseObject *>(this);
         variant_t variant;
@@ -850,7 +859,7 @@ namespace Mod::Etc::Mapentity_Additions
         if (rtti_cast<CTriggerCamera *>(view) != nullptr && view->GetCustomVariableFloat<"allowdamage">() == 0) {
             return;
         }
-        DETOUR_MEMBER_CALL(explode, force);
+        DETOUR_MEMBER_CALL(CBasePlayer_CommitSuicide)(explode, force);
 	}
 
 	DETOUR_DECL_STATIC(CTFDroppedWeapon *, CTFDroppedWeapon_Create, const Vector& vecOrigin, const QAngle& vecAngles, CBaseEntity *pOwner, const char *pszModelName, const CEconItemView *pItemView)
@@ -864,7 +873,7 @@ namespace Mod::Etc::Mapentity_Additions
 			TFGameRules()->Set_m_bPlayingMannVsMachine(false);
 		}
 		
-		auto result = DETOUR_STATIC_CALL(vecOrigin, vecAngles, pOwner, pszModelName, pItemView);
+		auto result = DETOUR_STATIC_CALL(CTFDroppedWeapon_Create)(vecOrigin, vecAngles, pOwner, pszModelName, pItemView);
 		
 		if (allow_create_dropped_weapon) {
 			TFGameRules()->Set_m_bPlayingMannVsMachine(is_mvm_mode);
@@ -887,7 +896,7 @@ namespace Mod::Etc::Mapentity_Additions
         variant.SetInt(entity->entindex());
         entity->FireCustomOutput<"onkilled">(entity, entity, variant);
 
-		DETOUR_MEMBER_CALL();
+		DETOUR_MEMBER_CALL(CBaseEntity_UpdateOnRemove)();
 	}
 
     THINK_FUNC_DECL(OnSpawnOutputFire)
@@ -898,7 +907,7 @@ namespace Mod::Etc::Mapentity_Additions
     DETOUR_DECL_MEMBER(void, CBaseEntity_Activate)
 	{
         auto entity = reinterpret_cast<CBaseEntity *>(this);
-        DETOUR_MEMBER_CALL();
+        DETOUR_MEMBER_CALL(CBaseEntity_Activate)();
         if (entity->GetExtraEntityData() != nullptr) {
             THINK_FUNC_SET(entity, OnSpawnOutputFire, gpGlobals->curtime);
         }
@@ -924,14 +933,14 @@ namespace Mod::Etc::Mapentity_Additions
         if (szKeyName[0] == '$') {
             ParseCustomOutput(parse_ent, szKeyName + 1, szValue);
         }
-        return DETOUR_MEMBER_CALL(szKeyName, szValue);
+        return DETOUR_MEMBER_CALL(CBaseEntity_KeyValue)(szKeyName, szValue);
 	}
 
     DETOUR_DECL_MEMBER(bool, CTankSpawner_Spawn, const Vector& where, CUtlVector<CHandle<CBaseEntity>> *ents)
 	{
 		auto spawner = reinterpret_cast<CTankSpawner *>(this);
 		
-		auto result = DETOUR_MEMBER_CALL(where, ents);
+		auto result = DETOUR_MEMBER_CALL(CTankSpawner_Spawn)(where, ents);
 		
         if (cvar_fast_lookup.GetBool() && result && ents != nullptr && !ents->IsEmpty()) {
 
@@ -948,7 +957,7 @@ namespace Mod::Etc::Mapentity_Additions
 	{
 		auto timer = reinterpret_cast<CBaseEntity *>(this);
 		
-		DETOUR_MEMBER_CALL(inputdata);
+		DETOUR_MEMBER_CALL(CTeamRoundTimer_InputSetTime)(inputdata);
 		
         // On some gamemodes, the game spawns timers automatically, the names are not pooled and need to be in order for fast lookup to work
         if (cvar_fast_lookup.GetBool()) {
@@ -962,7 +971,7 @@ namespace Mod::Etc::Mapentity_Additions
     //         StrLowerCopy(classname, lowercase, 255);
     //         reinterpret_cast<CBaseEntity *>(this)->SetClassname(AllocPooledString(lowercase));
     //     }
-    //     return DETOUR_MEMBER_CALL(classname);
+    //     return DETOUR_MEMBER_CALL(CBaseEntity_PostConstructor)(classname);
     // }
 
     PooledString filter_keyvalue_class("$filter_keyvalue");
@@ -1088,7 +1097,7 @@ namespace Mod::Etc::Mapentity_Additions
                     center = ent->GetAbsOrigin();
                 }
 
-                return ((Vector &)pEntity->GetAbsOrigin()).WithinAABox(min + center, max + center);
+                return pEntity->GetAbsOrigin().WithinAABox(min + center, max + center);
             }
             if (classname == filter_itemname_class && pEntity != nullptr) {
                 const char *type = filter->GetCustomVariable<"type">("ItemName");
@@ -1110,7 +1119,7 @@ namespace Mod::Etc::Mapentity_Additions
                 return false;
             }
         }
-        return DETOUR_MEMBER_CALL(pCaller, pEntity);
+        return DETOUR_MEMBER_CALL(CBaseFilter_PassesFilterImpl)(pCaller, pEntity);
 	}
 
     void OnCameraRemoved(CTriggerCamera *camera)
@@ -1133,7 +1142,7 @@ namespace Mod::Etc::Mapentity_Additions
         auto camera = reinterpret_cast<CTriggerCamera *>(this);
         auto player = ToTFPlayer(camera->m_hPlayer);
         int oldTakeDamage = player != nullptr ? player->m_takedamage : 0;
-        DETOUR_MEMBER_CALL();
+        DETOUR_MEMBER_CALL(CTriggerCamera_Enable)();
         if (player != nullptr && !player->IsAlive() && player->m_hViewEntity == camera) {
             camera->m_spawnflags |= 8192;
         }
@@ -1148,7 +1157,7 @@ namespace Mod::Etc::Mapentity_Additions
         auto player = ToTFPlayer(camera->m_hPlayer);
         int oldTakeDamage = player != nullptr ? camera->m_hPlayer->m_takedamage : 0;
         CBaseEntity *view = player != nullptr ? player->m_hViewEntity.Get() : nullptr;
-        DETOUR_MEMBER_CALL();
+        DETOUR_MEMBER_CALL(CTriggerCamera_Disable)();
         if (player != nullptr && view == camera) {
             if (!player->IsAlive()) {
                 player->m_hViewEntity = nullptr;
@@ -1171,13 +1180,13 @@ namespace Mod::Etc::Mapentity_Additions
     DETOUR_DECL_MEMBER(void, CTriggerCamera_D0)
 	{
         OnCameraRemoved(reinterpret_cast<CTriggerCamera *>(this));
-        DETOUR_MEMBER_CALL();
+        DETOUR_MEMBER_CALL(CTriggerCamera_D0)();
     }
 
     DETOUR_DECL_MEMBER(void, CTriggerCamera_D2)
 	{
         OnCameraRemoved(reinterpret_cast<CTriggerCamera *>(this));
-        DETOUR_MEMBER_CALL();
+        DETOUR_MEMBER_CALL(CTriggerCamera_D2)();
     }
 
     DETOUR_DECL_MEMBER(void, CFuncRotating_InputStop, inputdata_t *inputdata)
@@ -1186,7 +1195,7 @@ namespace Mod::Etc::Mapentity_Additions
         if (data != nullptr) {
             data->m_hRotateTarget = nullptr;
         }
-        DETOUR_MEMBER_CALL(inputdata);
+        DETOUR_MEMBER_CALL(CFuncRotating_InputStop)(inputdata);
     }
 
     THINK_FUNC_DECL(DetectorTick)
@@ -1301,7 +1310,7 @@ namespace Mod::Etc::Mapentity_Additions
             auto data = GetExtraTriggerDetectorData(trigger);
             THINK_FUNC_SET(trigger, DetectorTick, gpGlobals->curtime);
         }
-        DETOUR_MEMBER_CALL();
+        DETOUR_MEMBER_CALL(CBaseTrigger_Activate)();
     }
 
     THINK_FUNC_DECL(WeaponSpawnerTick)
@@ -1444,7 +1453,7 @@ namespace Mod::Etc::Mapentity_Additions
 	{
         if (rc_IsSpaceToSpawnHere_Allow) return true;
 
-		return DETOUR_STATIC_CALL(pos);
+		return DETOUR_STATIC_CALL(IsSpaceToSpawnHere)(pos);
 	}
 
     THINK_FUNC_DECL(TFBotClearCustomVars) {
@@ -1467,7 +1476,7 @@ namespace Mod::Etc::Mapentity_Additions
             THINK_FUNC_SET(player, TFBotClearCustomVars, gpGlobals->curtime);
         }
 		
-		DETOUR_MEMBER_CALL(nState);
+		DETOUR_MEMBER_CALL(CTFPlayer_StateEnter)(nState);
 	}
 
     VHOOK_DECL(bool, CPointTeleport_KeyValue, const char *szKeyName, const char *szValue)
@@ -1480,7 +1489,7 @@ namespace Mod::Etc::Mapentity_Additions
             mod->kv->AddSubKey(kv);
             return true;
         }
-        return VHOOK_CALL(szKeyName, szValue);
+        return VHOOK_CALL(CPointTeleport_KeyValue)(szKeyName, szValue);
 	}
 
     DETOUR_DECL_MEMBER(void, CPointTeleport_Activate)
@@ -1489,7 +1498,7 @@ namespace Mod::Etc::Mapentity_Additions
         if (spawner->GetClassname() == weapon_spawner_classname) {
             THINK_FUNC_SET(spawner, WeaponSpawnerTick, gpGlobals->curtime + 0.1f);
         }
-        DETOUR_MEMBER_CALL();
+        DETOUR_MEMBER_CALL(CPointTeleport_Activate)();
         if (spawner->GetClassname() == PStr<"$tf_bot_spawn">()) {
             if (!SpawnTFBotRetry(spawner) && !spawner->GetCustomVariableBool<"manualspawn">()) {
                 THINK_FUNC_SET(spawner, SpawnTFBotThink, gpGlobals->curtime);
@@ -1522,7 +1531,7 @@ namespace Mod::Etc::Mapentity_Additions
             }
         }
         else {
-            DETOUR_MEMBER_CALL(player, weapon);
+            DETOUR_MEMBER_CALL(CTFDroppedWeapon_InitPickedUpWeapon)(player, weapon);
         }
 		
 	}
@@ -1533,7 +1542,7 @@ namespace Mod::Etc::Mapentity_Additions
 	{
         filter_entity = reinterpret_cast<CBaseEntity *>(this);
         filter_total_multiplier = 1.0f;
-        auto ret = DETOUR_MEMBER_CALL(info);
+        auto ret = DETOUR_MEMBER_CALL(CBaseFilter_PassesDamageFilter)(info);
         if (filter_total_multiplier != 1.0f) {
             if (filter_total_multiplier > 0)
                 info.SetDamage(info.GetDamage() * filter_total_multiplier);
@@ -1548,7 +1557,7 @@ namespace Mod::Etc::Mapentity_Additions
     
     DETOUR_DECL_MEMBER(bool, CBaseFilter_PassesDamageFilter, CTakeDamageInfo &info)
 	{
-        auto ret = DETOUR_MEMBER_CALL(info);
+        auto ret = DETOUR_MEMBER_CALL(CBaseFilter_PassesDamageFilter)(info);
         auto filter = reinterpret_cast<CBaseEntity *>(this);
 
         float multiplier = filter->GetCustomVariableFloat<"multiplier">();
@@ -1578,7 +1587,7 @@ namespace Mod::Etc::Mapentity_Additions
                 return iDmgType == filter->GetCustomVariableFloat<"type">();
             }
         }
-        return DETOUR_MEMBER_CALL(info);
+        return DETOUR_MEMBER_CALL(CBaseFilter_PassesDamageFilterImpl)(info);
     }
 
     DETOUR_DECL_MEMBER(void, CEventQueue_AddEvent_CBaseEntity, CBaseEntity *target, const char *targetInput, variant_t Value, float fireDelay, CBaseEntity *pActivator, CBaseEntity *pCaller, int outputID)
@@ -1589,7 +1598,7 @@ namespace Mod::Etc::Mapentity_Additions
             }
             return;
         }
-        DETOUR_MEMBER_CALL(target, targetInput, Value, fireDelay, pActivator, pCaller, outputID);
+        DETOUR_MEMBER_CALL(CEventQueue_AddEvent_CBaseEntity)(target, targetInput, Value, fireDelay, pActivator, pCaller, outputID);
     }
 
     DETOUR_DECL_MEMBER(void, CEventQueue_CancelEvents, CBaseEntity *caller)
@@ -1619,12 +1628,12 @@ namespace Mod::Etc::Mapentity_Additions
             }
             return;
         }
-        DETOUR_MEMBER_CALL(target, targetInput, Value, fireDelay, pActivator, pCaller, outputID);
+        DETOUR_MEMBER_CALL(CEventQueue_AddEvent)(target, targetInput, Value, fireDelay, pActivator, pCaller, outputID);
     }
 
 	DETOUR_DECL_STATIC(CBaseEntity *, CreateEntityByName, const char *className, int iForceEdictIndex)
 	{
-		auto ret = DETOUR_STATIC_CALL(className, iForceEdictIndex);
+		auto ret = DETOUR_STATIC_CALL(CreateEntityByName)(className, iForceEdictIndex);
         if (ret != nullptr && !entity_listeners.empty()) {
             auto classNameOur = MAKE_STRING(ret->GetClassname());
             for (auto it = entity_listeners.begin(); it != entity_listeners.end();) {
@@ -1647,14 +1656,14 @@ namespace Mod::Etc::Mapentity_Additions
 
     DETOUR_DECL_MEMBER(void, CEventAction_CEventAction, const char *name)
 	{
-        if (name == nullptr) { DETOUR_MEMBER_CALL(name); return; }
+        if (name == nullptr) { DETOUR_MEMBER_CALL(CEventAction_CEventAction)(name); return; }
 
         //TIME_SCOPE2(cevent)
         char *newname = nullptr;
         const char *findthis = FindCaseSensitive(name, "$$=");
         if (findthis != nullptr) {
             char c;
-            newname = (char *)alloca(strlen(name)+1);
+            newname = alloca(strlen(name)+1);
             strcpy(newname, name);
             int scope = 0;
             char *change = newname + (findthis - name);
@@ -1682,7 +1691,7 @@ namespace Mod::Etc::Mapentity_Additions
             name = newname;
         }
         //Msg("Event action post %s\n", name);
-        DETOUR_MEMBER_CALL(name);
+        DETOUR_MEMBER_CALL(CEventAction_CEventAction)(name);
     }
 
     DETOUR_DECL_STATIC(void, SV_ComputeClientPacks, int clientCount,  void **clients, void *snapshot)
@@ -1693,7 +1702,7 @@ namespace Mod::Etc::Mapentity_Additions
                 SetEntityVariable(module->entity, SENDPROP, entry.first.c_str(), entry.second.first);
             }
         }
-		DETOUR_STATIC_CALL(clientCount, clients, snapshot);
+		DETOUR_STATIC_CALL(SV_ComputeClientPacks)(clientCount, clients, snapshot);
         for (auto &module : FakePropModule::List()) {
             for (auto &entry : module->props) {
                 SetEntityVariable(module->entity, SENDPROP, entry.first.c_str(), entry.second.second);
@@ -1705,14 +1714,14 @@ namespace Mod::Etc::Mapentity_Additions
 	{
         if (entity->GetClassname() == PStr<"$script_manager">()) return true;
 
-        return DETOUR_MEMBER_CALL(entity);
+        return DETOUR_MEMBER_CALL(CTFGameRules_RoundCleanupShouldIgnore)(entity);
     }
 
     DETOUR_DECL_MEMBER(bool, CTFGameRules_ShouldCreateEntity, const char *classname)
 	{
         if (strcmp(classname, "$script_manager") == 0) return false;
         
-        return DETOUR_MEMBER_CALL(classname);
+        return DETOUR_MEMBER_CALL(CTFGameRules_ShouldCreateEntity)(classname);
     }
     
 
@@ -1740,7 +1749,7 @@ namespace Mod::Etc::Mapentity_Additions
             mod->Activate();
         }
         
-        return VHOOK_CALL();
+        return VHOOK_CALL(CMathCounter_Activate)();
     }
     bool DoCollideTestInternal(CBaseEntity *entity1, CBaseEntity *entity2, bool &result, variant_t &val) {
         auto filterEnt = static_cast<CBaseFilter *>(val.Entity().Get());
@@ -1793,7 +1802,7 @@ namespace Mod::Etc::Mapentity_Additions
                 return result;
             }
         }
-        return DETOUR_STATIC_CALL(ent1, ent2);
+        return DETOUR_STATIC_CALL(PassServerEntityFilter)(ent1, ent2);
     }
 
     DETOUR_DECL_MEMBER(int, CCollisionEvent_ShouldCollide, IPhysicsObject *pObj0, IPhysicsObject *pObj1, void *pGameData0, void *pGameData1)
@@ -1813,7 +1822,7 @@ namespace Mod::Etc::Mapentity_Additions
                 }
             }
         }
-        return DETOUR_MEMBER_CALL(pObj0, pObj1, pGameData0, pGameData1);
+        return DETOUR_MEMBER_CALL(CCollisionEvent_ShouldCollide)(pObj0, pObj1, pGameData0, pGameData1);
     }
 
     DETOUR_DECL_MEMBER(int, CBaseEntity_DispatchUpdateTransmitState)
@@ -1832,7 +1841,7 @@ namespace Mod::Etc::Mapentity_Additions
                 return FL_EDICT_FULLCHECK;
             }
         }
-        return DETOUR_MEMBER_CALL();
+        return DETOUR_MEMBER_CALL(CBaseEntity_DispatchUpdateTransmitState)();
     }
 
     bool ModVisibilityUpdate(CBaseEntity *entity, const CCheckTransmitInfo *info)
@@ -1860,7 +1869,7 @@ namespace Mod::Etc::Mapentity_Additions
             if (entity->GetExtraEntityData() != nullptr && ModVisibilityUpdate(entity, info))
                 return FL_EDICT_DONTSEND;
         }
-        return DETOUR_MEMBER_CALL(info);
+        return DETOUR_MEMBER_CALL(CBaseEntity_ShouldTransmit)(info);
     }
 
     void ClearFakeProp()
@@ -1886,7 +1895,7 @@ namespace Mod::Etc::Mapentity_Additions
     
     DETOUR_DECL_MEMBER_CALL_CONVENTION(__gcc_regcall, bool, CPopulationManager_Initialize)
 	{
-		auto ret = DETOUR_MEMBER_CALL();
+		auto ret = DETOUR_MEMBER_CALL(CPopulationManager_Initialize)();
         
 #ifndef NO_MVM
         if (change_level_info.setInitializeCurrency) {
@@ -1910,14 +1919,14 @@ namespace Mod::Etc::Mapentity_Additions
 
     DETOUR_DECL_MEMBER(void, CPopulationManager_ResetMap)
 	{
-		DETOUR_MEMBER_CALL();
+		DETOUR_MEMBER_CALL(CPopulationManager_ResetMap)();
         change_level_info.setInitializeCurrency = false;
     }
 
 	DETOUR_DECL_MEMBER(void, CObjectTeleporter_RecieveTeleportingPlayer, CTFPlayer *player)
 	{
         auto tele = reinterpret_cast<CObjectTeleporter *>(this);
-		DETOUR_MEMBER_CALL(player);
+		DETOUR_MEMBER_CALL(CObjectTeleporter_RecieveTeleportingPlayer)(player);
         if (player != nullptr) {
             tele->FireCustomOutput<"onteleportreceive">(player, tele, Variant());
         }
@@ -1930,7 +1939,7 @@ namespace Mod::Etc::Mapentity_Additions
         if (s_lastTeleporter.GetRef() == nullptr) {
             s_lastTeleporter.GetRef() = player;
         }
-		DETOUR_STATIC_CALL(player);
+		DETOUR_STATIC_CALL(OnBotTeleported)(player);
         if (s_lastTeleporter.GetRef() != nullptr) {
             s_lastTeleporter.GetRef()->FireCustomOutput<"onteleportreceive">(player, s_lastTeleporter.GetRef(), Variant());
         }
@@ -1938,7 +1947,7 @@ namespace Mod::Etc::Mapentity_Additions
 
 	VHOOK_DECL(void, CObjectSentrygun_FireBullets, FireBulletsInfo_t &info)
 	{
-        VHOOK_CALL(info);
+        VHOOK_CALL(CObjectSentrygun_FireBullets)(info);
         auto sentry = reinterpret_cast<CObjectSentrygun *>(this);
         sentry->FireCustomOutput<"onshootbullet">(sentry, sentry, Variant());
     }
@@ -1946,7 +1955,7 @@ namespace Mod::Etc::Mapentity_Additions
     CBaseEntity *sentry_gun_rocket = nullptr;
     DETOUR_DECL_STATIC(CTFProjectile_SentryRocket *, CTFProjectile_SentryRocket_Create, const Vector &vecOrigin, const QAngle &vecAngles, CBaseEntity *pOwner, CBaseEntity *pScorer)
 	{
-		auto ret = DETOUR_STATIC_CALL(vecOrigin, vecAngles, pOwner, pScorer);
+		auto ret = DETOUR_STATIC_CALL(CTFProjectile_SentryRocket_Create)(vecOrigin, vecAngles, pOwner, pScorer);
 		sentry_gun_rocket = ret;
 		return ret;
 	}
@@ -1954,7 +1963,7 @@ namespace Mod::Etc::Mapentity_Additions
     DETOUR_DECL_MEMBER(bool, CObjectSentrygun_FireRocket)
 	{
 		sentry_gun_rocket = nullptr;
-		bool ret = DETOUR_MEMBER_CALL();
+		bool ret = DETOUR_MEMBER_CALL(CObjectSentrygun_FireRocket)();
 		if (ret && sentry_gun_rocket != nullptr) {
             auto sentry = reinterpret_cast<CObjectSentrygun *>(this);
             sentry->FireCustomOutput<"onshootrocket">(sentry_gun_rocket, sentry, Variant());
@@ -1980,7 +1989,7 @@ namespace Mod::Etc::Mapentity_Additions
                 }
             }
         }
-		auto result = DETOUR_MEMBER_CALL();
+		auto result = DETOUR_MEMBER_CALL(CTFBot_GetFlagToFetch)();
         for (auto flag : disabledFlags) {
             flag->SetDisabled(false);
         }
@@ -1998,7 +2007,7 @@ namespace Mod::Etc::Mapentity_Additions
                 return;
             }
         }
-		DETOUR_MEMBER_CALL(other);
+		DETOUR_MEMBER_CALL(CCaptureFlag_FlagTouch)(other);
 	}
 
 	DETOUR_DECL_MEMBER(bool, CFlagDetectionZone_EntityIsFlagCarrier, CBaseEntity *other)
@@ -2020,14 +2029,14 @@ namespace Mod::Etc::Mapentity_Additions
                 return false;
             }
         }
-		return DETOUR_MEMBER_CALL(other);
+		return DETOUR_MEMBER_CALL(CFlagDetectionZone_EntityIsFlagCarrier)(other);
 	}
     
     RefCount rc_CTFBotDeliverFlag_UpgradeOverTime;
 	DETOUR_DECL_MEMBER(bool,CTFBotDeliverFlag_UpgradeOverTime, CTFBot *bot)
 	{
         SCOPED_INCREMENT_IF(rc_CTFBotDeliverFlag_UpgradeOverTime, bot->GetItem() != nullptr && bot->GetItem()->GetCustomVariableBool<"disablebuffs">());
-		auto result = DETOUR_MEMBER_CALL(bot);
+		auto result = DETOUR_MEMBER_CALL(CTFBotDeliverFlag_UpgradeOverTime)(bot);
         if (result && bot->GetItem() != nullptr) {
             switch (TFObjectiveResource()->m_nFlagCarrierUpgradeLevel) {
                 case 1: bot->GetItem()->FireCustomOutput<"onbombupgradelevel1">(bot, bot->GetItem(), Variant()); break;
@@ -2045,18 +2054,18 @@ namespace Mod::Etc::Mapentity_Additions
 	{
         if (rc_CTFBotDeliverFlag_UpgradeOverTime) return;
 
-		DETOUR_MEMBER_CALL(nCond, flDuration, pProvider);
+		DETOUR_MEMBER_CALL(CTFPlayerShared_AddCond)(nCond, flDuration, pProvider);
     }
 
     DETOUR_DECL_MEMBER(void, CCaptureFlag_Drop, CTFPlayer *pPlayer, bool bVisible, bool bThrown, bool bMessage)
 	{
-		DETOUR_MEMBER_CALL(pPlayer, bVisible, bThrown, bMessage);
+		DETOUR_MEMBER_CALL(CCaptureFlag_Drop)(pPlayer, bVisible, bThrown, bMessage);
         auto flag = reinterpret_cast<CCaptureFlag *>(this);
         flag->FireCustomOutput<"ondrop">(pPlayer, flag, Variant());
     }
     DETOUR_DECL_MEMBER(void, CCaptureFlag_PickUp, CTFPlayer *player, bool invisible)
 	{
-		DETOUR_MEMBER_CALL(player, invisible);
+		DETOUR_MEMBER_CALL(CCaptureFlag_PickUp)(player, invisible);
 		auto flag = reinterpret_cast<CCaptureFlag *>(this);
         flag->FireCustomOutput<"onpickup">(player, flag, Variant());
     }
@@ -2073,14 +2082,14 @@ namespace Mod::Etc::Mapentity_Additions
             pushEntity = push;
             pushFilter = rtti_cast<CBaseFilter *>(val.Entity().Get());
         }
-		DETOUR_MEMBER_CALL();
+		DETOUR_MEMBER_CALL(CPointPush_PushThink)();
         pushFilter = nullptr;
         pushEntity = nullptr;
 	}
 
     DETOUR_DECL_STATIC(int, UTIL_EntitiesInSphere, const Vector& center, float radius, CFlaggedEntitiesEnum *pEnum)
 	{
-		auto result = DETOUR_STATIC_CALL(center, radius, pEnum);
+		auto result = DETOUR_STATIC_CALL(UTIL_EntitiesInSphere)(center, radius, pEnum);
         if (pushFilter != nullptr) {
             auto list = pEnum->GetList();
             for (auto i = 0; i < pEnum->GetCount(); i++) {
@@ -2100,7 +2109,7 @@ namespace Mod::Etc::Mapentity_Additions
     DETOUR_DECL_MEMBER(bool, IVision_IsLineOfSightClear, const Vector &pos)
 	{
 		seeEntity = reinterpret_cast<IVision *>(this)->GetBot()->GetEntity();
-		auto result = DETOUR_MEMBER_CALL(pos);
+		auto result = DETOUR_MEMBER_CALL(IVision_IsLineOfSightClear)(pos);
         seeEntity = nullptr;
         return result;
 	}
@@ -2108,7 +2117,7 @@ namespace Mod::Etc::Mapentity_Additions
 	DETOUR_DECL_MEMBER(bool, IVision_IsLineOfSightClearToEntity, CBaseEntity *subject, Vector *visibleSpot)
 	{
 		seeEntity = reinterpret_cast<IVision *>(this)->GetBot()->GetEntity();
-		auto result = DETOUR_MEMBER_CALL(subject, visibleSpot);
+		auto result = DETOUR_MEMBER_CALL(IVision_IsLineOfSightClearToEntity)(subject, visibleSpot);
         seeEntity = nullptr;
         return result;
 	}
@@ -2129,7 +2138,7 @@ namespace Mod::Etc::Mapentity_Additions
             }
             return true;
         }
-        return VHOOK_CALL(collisionGroup, contentsMask);
+        return VHOOK_CALL(CFuncWall_ShouldCollide)(collisionGroup, contentsMask);
     }
     
     GlobalThunk<float[3]> PackRatios("PackRatios");
@@ -2147,7 +2156,7 @@ namespace Mod::Etc::Mapentity_Additions
             packRatiosArr[1] = ratio;
             packRatiosArr[2] = ratio;
         }
-        DETOUR_MEMBER_CALL(entity);
+        DETOUR_MEMBER_CALL(CItem_ItemTouch)(entity);
         if (ratio != -1.0f) {
             packRatiosArr[0] = oldPackRatios[0];
             packRatiosArr[1] = oldPackRatios[1];
@@ -2187,7 +2196,7 @@ namespace Mod::Etc::Mapentity_Additions
                 return true;
             }
         }
-        return VHOOK_CALL(szKeyName, szValue);
+        return VHOOK_CALL(CTFBot_KeyValue)(szKeyName, szValue);
 	}
 
 	DETOUR_DECL_MEMBER(void, CTFBot_Spawn)
@@ -2198,7 +2207,7 @@ namespace Mod::Etc::Mapentity_Additions
             return;
         }
 
-		DETOUR_MEMBER_CALL();
+		DETOUR_MEMBER_CALL(CTFBot_Spawn)();
 	}
 
     VHOOK_DECL(void, CTFBot_Activate)
@@ -2209,7 +2218,7 @@ namespace Mod::Etc::Mapentity_Additions
         if (mod != nullptr) {
             bot->m_iInitialTeamNum = 0;
         }
-        VHOOK_CALL();
+        VHOOK_CALL(CTFBot_Activate)();
         if (mod != nullptr) {
             mod->activated = true;
             auto spawner = IPopulationSpawner::ParseSpawner(&mod->populator, mod->kv);
@@ -2253,7 +2262,7 @@ namespace Mod::Etc::Mapentity_Additions
                 THINK_FUNC_SET(player, PlayerKickThink, gpGlobals->curtime + player->GetCustomVariableFloat<"kickafterdeathdelay">(-1.0f));
             }
 		}
-		DETOUR_MEMBER_CALL();
+		DETOUR_MEMBER_CALL(CTFPlayer_StateLeave)();
     }
 
 #ifndef NO_MVM
@@ -2264,7 +2273,7 @@ namespace Mod::Etc::Mapentity_Additions
             betweenWavesModifiedWaveBar = false;
             return;
         }
-		DETOUR_MEMBER_CALL();
+		DETOUR_MEMBER_CALL(CPopulationManager_UpdateObjectiveResource)();
 	}
 #endif
 
@@ -2316,7 +2325,7 @@ namespace Mod::Etc::Mapentity_Additions
 			MOD_ADD_DETOUR_MEMBER(CBaseEntityOutput_FireOutput, "CBaseEntityOutput::FireOutput");
 			MOD_ADD_DETOUR_MEMBER(CBaseEntity_AcceptInput, "CBaseEntity::AcceptInput");
 			MOD_ADD_DETOUR_MEMBER(CTFGameRules_CleanUpMap, "CTFGameRules::CleanUpMap");
-			MOD_ADD_DETOUR_MEMBER(CTFMedigunShield_ShieldThink, "CTFMedigunShield::ShieldThink");
+			MOD_ADD_DETOUR_MEMBER(CTFMedigunShield_RemoveShield, "CTFMedigunShield::RemoveShield");
 			MOD_ADD_DETOUR_MEMBER(CTriggerHurt_HurtEntity, "CTriggerHurt::HurtEntity [clone]");
 			MOD_ADD_DETOUR_MEMBER(CTriggerIgnite_IgniteEntity, "CTriggerIgnite::IgniteEntity");
 			MOD_ADD_DETOUR_MEMBER(CTriggerIgnite_BurnEntities, "CTriggerIgnite::BurnEntities [clone]");
@@ -2413,6 +2422,7 @@ namespace Mod::Etc::Mapentity_Additions
 			MOD_ADD_DETOUR_MEMBER(CPopulationManager_UpdateObjectiveResource, "CPopulationManager::UpdateObjectiveResource");
 #endif
 		//	MOD_ADD_DETOUR_MEMBER(CTFMedigunShield_UpdateShieldPosition, "CTFMedigunShield::UpdateShieldPosition");
+		//	MOD_ADD_DETOUR_MEMBER(CTFMedigunShield_ShieldThink, "CTFMedigunShield::ShieldThink");
 		//	MOD_ADD_DETOUR_MEMBER(CBaseGrenade_SetDamage, "CBaseGrenade::SetDamage");
 		}
 

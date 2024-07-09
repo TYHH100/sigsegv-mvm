@@ -13,7 +13,7 @@ namespace Mod::Pop::Teleporter_Aggro
 	DETOUR_DECL_MEMBER(void, CTFBotVision_UpdatePotentiallyVisibleNPCVector)
 	{
 		if (!TFGameRules()->IsMannVsMachineMode()) {
-			DETOUR_MEMBER_CALL();
+			DETOUR_MEMBER_CALL(CTFBotVision_UpdatePotentiallyVisibleNPCVector)();
 			return;
 		}
 
@@ -26,7 +26,7 @@ namespace Mod::Pop::Teleporter_Aggro
 		if (allow)
 			TFGameRules()->Set_m_bPlayingMannVsMachine(false);
 
-		DETOUR_MEMBER_CALL();
+		DETOUR_MEMBER_CALL(CTFBotVision_UpdatePotentiallyVisibleNPCVector)();
 
 		if (allow)
 			TFGameRules()->Set_m_bPlayingMannVsMachine(true);

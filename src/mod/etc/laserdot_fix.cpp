@@ -30,7 +30,7 @@ namespace Mod::Etc::LaserDot_Fix
 		// "CLaserDot"
 		// "CSniperDot"
 		
-		DETOUR_MEMBER_CALL();
+		DETOUR_MEMBER_CALL(C_SniperDot_ClientThink)();
 #endif
 	}
 	

@@ -112,7 +112,7 @@ protected:
 class CFuncReplace : public CPatch
 {
 public:
-	CFuncReplace(size_t size, void *func, const char *func_name) : CPatch(size + 32), m_zFuncSize(size), m_szFuncName(func_name), m_pFunc(func) {}
+	CFuncReplace(size_t size, void *func, const char *func_name) : CPatch(size), m_szFuncName(func_name), m_pFunc(func) {}
 
 	virtual const char *GetFuncName() const override { return m_szFuncName.c_str(); }
 	virtual uint32_t GetFuncOffMin() const override  { return 0x0000; }
@@ -123,12 +123,18 @@ public:
 		auto data = (uint8_t *) m_pFunc;
 
 		buf.CopyFrom(data);
-		mask.SetAll(0x00);
 
+		mask.SetAll(0x00);
+		
 		return true;
 	}
 	
-	virtual bool GetPatchInfo(ByteBuf& buf, ByteBuf& mask) const override;
+	virtual bool GetPatchInfo(ByteBuf& buf, ByteBuf& mask) const override
+	{
+		mask.SetAll(0xFF);
+		
+		return true;
+	}
 	
 	virtual bool AdjustPatchInfo(ByteBuf& buf) const override
 	{
@@ -136,7 +142,6 @@ public:
 	}
 private:
 
-	size_t m_zFuncSize;
 	std::string m_szFuncName;
 	void *m_pFunc;
 };
@@ -161,12 +166,14 @@ private:
 
 // Replace original function code with provided function. Remember that:
 // 1. It must be placed outside of namespace
-// 2. The original function code + 16 byte alignment must be larger than the replacement. There is no protection against patching smaller original functions!
+// 2. The original function code must be larger than the replacement. There is no protection against patching smaller original functions!
+// 3. Non-virtual non-inline non-address calls to our functions are not allowed. You can make an address call by using auto ourfunc1 = &OurFunc; and calling ourfunc1
 #define REPLACE_FUNC_STATIC(ret, name, ...) REPLACE_FUNC_STATIC_ATTRIBUTES(,ret,name,__VA_ARGS__)
 
 // Replace original function code with provided function. Remember that:
 // 1. It must be placed outside of namespace
-// 2. The original function code + 16 byte alignment must be larger than the replacement. There is no protection against patching smaller original functions!
+// 2. The original function code must be larger than the replacement. There is no protection against patching smaller original functions!
+// 3. Non-virtual non-inline non-address calls to our functions are not allowed. You can make an address call by using auto ourfunc1 = &OurFunc; and calling ourfunc1
 #define REPLACE_FUNC_MEMBER(ret, name, ...) REPLACE_FUNC_MEMBER_ATTRIBUTES(,ret,name,__VA_ARGS__)
 
 // Same as REPLACE_FUNC_STATIC but the function is space optimized instead

@@ -136,7 +136,7 @@ namespace Mod::Util::Notify_Recv
 		ReceivePackets();
 		ProcessQueuedPackets();
 		
-		DETOUR_STATIC_CALL();
+		DETOUR_STATIC_CALL(CDebugOverlay_DrawAllOverlays)();
 	}
 	
 	

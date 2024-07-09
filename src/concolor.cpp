@@ -1,9 +1,7 @@
 #include "concolor.h"
 #include "util/misc.h"
 
-#ifndef PLATFORM_64BITS
 #include <ANN/ANN.h>
-#endif
 
 
 namespace ColorSpew
@@ -116,7 +114,6 @@ namespace ColorSpew
 	ColorMap_ANSI16 map_ANSI16;
 	
 	
-#ifndef PLATFORM_64BITS
 	class ColorMap_ANSI256
 	{
 	public:
@@ -179,7 +176,6 @@ namespace ColorSpew
 		ANNkd_tree *m_Colors      = nullptr;
 	};
 	ColorMap_ANSI256 map_ANSI256;
-#endif
 	
 	
 	SpewRetval_t Spew_Return(SpewType_t type)
@@ -203,34 +199,32 @@ namespace ColorSpew
 	{
 		int c = map_ANSI16.Map(*GetSpewOutputColor());
 
-		char text[2048];
+		char text[256];
 		if (c < 8) {
-			snprintf(text, 2048, "\e[%dm" "%s" "\e[0m", 30 + c, pMsg);
+			snprintf(text, 256, "\e[%dm" "%s" "\e[0m", 30 + c, pMsg);
 		} else {
-			snprintf(text, 2048, "\e[%d;1m" "%s" "\e[0m", 30 + (c - 8), pMsg);
+			snprintf(text, 256, "\e[%d;1m" "%s" "\e[0m", 30 + (c - 8), pMsg);
 		}
 		
 		return s_SpewOutputBackup(type, pMsg);
 	}
 	
-#ifndef PLATFORM_64BITS
 	SpewRetval_t Spew_ANSI_256Colors(SpewType_t type, const char *pMsg)
 	{
 		int c = map_ANSI256.Map(*GetSpewOutputColor());
 		
-		char text[2048];
-		snprintf(text, 2048, "\e[38;2;%dm" "%s" "\e[0m", 16 + c, pMsg);
+		char text[256];
+		snprintf(text, 256, "\e[38;2;%dm" "%s" "\e[0m", 16 + c, pMsg);
 		
 		return s_SpewOutputBackup(type, pMsg);
 	}
-#endif
 	
 	SpewRetval_t Spew_ANSI_TrueColor(SpewType_t type, const char *pMsg)
 	{
 		Color c = *GetSpewOutputColor();
 		
-		char text[2048];
-		snprintf(text, 2048, "\e[38;2;%d;%d;%dm" "%s" "\e[0m", c.r(), c.g(), c.b(), pMsg);
+		char text[256];
+		snprintf(text, 256, "\e[38;2;%d;%d;%dm" "%s" "\e[0m", c.r(), c.g(), c.b(), pMsg);
 		
 		return s_SpewOutputBackup(type, text);
 	}
@@ -251,11 +245,9 @@ namespace ColorSpew
 			case CM_16_COLORS:
 				SpewOutputFunc(&Spew_ANSI_16Colors);
 				break;
-#ifndef PLATFORM_64BITS
 			case CM_256_COLORS:
 				SpewOutputFunc(&Spew_ANSI_256Colors);
 				break;
-#endif
 			case CM_TRUE_COLOR:
 				SpewOutputFunc(&Spew_ANSI_TrueColor);
 				break;

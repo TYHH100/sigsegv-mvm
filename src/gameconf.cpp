@@ -7,7 +7,6 @@
 
 static const char *const configs[] = {
 	"sigsegv/datamaps",
-	"sigsegv/entities",
 	"sigsegv/globals",
 	"sigsegv/NextBotKnownEntity",
 	"sigsegv/NextBotContextualQueryInterface",
@@ -44,14 +43,6 @@ static const char *const configs[] = {
 
 CSigsegvGameConf g_GCHook;
 
-inline const std::string &GetSymbolName(const std::map<std::string, std::string> &kv) {
-#ifdef PLATFORM_64BITS
-	auto sym64 = kv.find("sym64");
-	if (sym64 != kv.end()) return sym64->second;
-#endif
-
-	return kv.at("sym");
-}
 
 bool CSigsegvGameConf::LoadAll(char *error, size_t maxlen)
 {
@@ -443,7 +434,7 @@ SMCResult CSigsegvGameConf::AddrEntry_Load_Sym()
 		}
 	}
 	
-	const auto& sym = GetSymbolName(kv);
+	const auto& sym = kv.at("sym");
 	
 	auto a = new CAddr_Sym(name, sym);
 	this->AddrEntry_Load_Common(a);
@@ -463,7 +454,7 @@ SMCResult CSigsegvGameConf::AddrEntry_Load_Sym_Regex()
 		}
 	}
 	
-	const auto& sym = GetSymbolName(kv);
+	const auto& sym = kv.at("sym");
 	
 	auto a = new CAddr_Sym_Regex(name, sym);
 	this->AddrEntry_Load_Common(a);
@@ -483,7 +474,7 @@ SMCResult CSigsegvGameConf::AddrEntry_Load_Fixed()
 		}
 	}
 	
-	const auto& sym = GetSymbolName(kv);
+	const auto& sym = kv.at("sym");
 	int addr        = stoi(kv.at("addr"), nullptr, 0);
 	int build       = stoi(kv.at("build"), nullptr, 0);
 	
@@ -505,7 +496,7 @@ SMCResult CSigsegvGameConf::AddrEntry_Load_Pattern()
 		}
 	}
 	
-	const auto& sym  = GetSymbolName(kv);
+	const auto& sym  = kv.at("sym");
 	const auto& seg  = kv.at("seg");
 	const auto& seek = kv.at("seek");
 	const auto& mask = kv.at("mask");
@@ -528,7 +519,7 @@ SMCResult CSigsegvGameConf::AddrEntry_Load_DataDescMap()
 		}
 	}
 	
-	const auto& sym    = GetSymbolName(kv);
+	const auto& sym    = kv.at("sym");
 	const auto& c_name = kv.at("class");
 	
 	auto a = new CAddr_DataDescMap(name, sym, c_name);
@@ -549,7 +540,7 @@ SMCResult CSigsegvGameConf::AddrEntry_Load_Func_KnownVTIdx()
 		}
 	}
 	
-	const auto& sym    = GetSymbolName(kv);
+	const auto& sym    = kv.at("sym");
 	const auto& vtable = kv.at("vtable");
 	int idx            = stoi(kv.at("idx"), nullptr, 0);
 	
@@ -571,7 +562,7 @@ SMCResult CSigsegvGameConf::AddrEntry_Load_Func_DataMap_VThunk()
 		}
 	}
 	
-	const auto& sym     = GetSymbolName(kv);
+	const auto& sym     = kv.at("sym");
 	const auto& datamap = kv.at("datamap");
 	const auto& f_name  = kv.at("func");
 	const auto& vtable  = kv.at("vtable");
@@ -594,7 +585,7 @@ SMCResult CSigsegvGameConf::AddrEntry_Load_Func_EBPPrologue_UniqueRef()
 		}
 	}
 	
-	const auto& sym    = GetSymbolName(kv);
+	const auto& sym    = kv.at("sym");
 	const auto& uniref = kv.at("uniref");
 	
 	auto a = new CAddr_Func_EBPPrologue_UniqueRef(name, sym, uniref);
@@ -615,7 +606,7 @@ SMCResult CSigsegvGameConf::AddrEntry_Load_Func_EBPPrologue_UniqueStr()
 		}
 	}
 	
-	const auto& sym    = GetSymbolName(kv);
+	const auto& sym    = kv.at("sym");
 	const auto& unistr = kv.at("unistr");
 	
 	auto a = new CAddr_Func_EBPPrologue_UniqueStr(name, sym, unistr);
@@ -636,7 +627,7 @@ SMCResult CSigsegvGameConf::AddrEntry_Load_Func_EBPPrologue_UniqueStr_KnownVTIdx
 		}
 	}
 	
-	const auto& sym    = GetSymbolName(kv);
+	const auto& sym    = kv.at("sym");
 	const auto& unistr = kv.at("unistr");
 	const auto& vtable = kv.at("vtable");
 	int idx            = stoi(kv.at("idx"), nullptr, 0);
@@ -659,7 +650,7 @@ SMCResult CSigsegvGameConf::AddrEntry_Load_Func_EBPPrologue_NonUniqueStr_KnownVT
 		}
 	}
 	
-	const auto& sym    = GetSymbolName(kv);
+	const auto& sym    = kv.at("sym");
 	const auto& str    = kv.at("str");
 	const auto& vtable = kv.at("vtable");
 	int idx            = stoi(kv.at("idx"), nullptr, 0);
@@ -682,7 +673,7 @@ SMCResult CSigsegvGameConf::AddrEntry_Load_Func_EBPPrologue_VProf()
 		}
 	}
 	
-	const auto& sym     = GetSymbolName(kv);
+	const auto& sym     = kv.at("sym");
 	const auto& v_name  = kv.at("v_name");
 	const auto& v_group = kv.at("v_group");
 	

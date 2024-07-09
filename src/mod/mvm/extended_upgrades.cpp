@@ -432,7 +432,7 @@ namespace Mod::MvM::Extended_Upgrades
         void *menu = nullptr;
         if (menus->GetDefaultStyle()->GetClientMenu(ENTINDEX(player), &menu) == MenuSource_BaseMenu && menu != nullptr) {
             auto title = ((IBaseMenu *)menu)->GetDefaultTitle();
-            return title != nullptr && (FStrEq(title, "玩家升级") || FStrEq(title, "Extended Upgrades Menu") || StringStartsWith(title, "Upgrades for"));
+            return title != nullptr && (FStrEq(title, "Player Upgrades") || FStrEq(title, "Extended Upgrades Menu") || StringStartsWith(title, "Upgrades for"));
             /*auto handler = ((IBaseMenu *)menu)->GetHandler();
             if (handler != nullptr && (dynamic_cast<SelectUpgradeWeaponHandler *>(handler) != nullptr || dynamic_cast<SelectUpgradeListHandler *>(handler) != nullptr)) {
                 return true;
@@ -1182,12 +1182,12 @@ namespace Mod::MvM::Extended_Upgrades
 
             if (enabled) {
 
-                char text[2048];
+                char text[128];
                 if (upgrade->increment != 0 && max_step < 100000 ) {
-                    snprintf(text, 2048, "%s (%d/%d) $%d", upgrade->name.c_str(), cur_step, max_step, upgrade->cost);
+                    snprintf(text, 128, "%s (%d/%d) $%d", upgrade->name.c_str(), cur_step, max_step, upgrade->cost);
                 }
                 else { // If increment == 0 or max steps less than 100000, pretend unlimited upgrades
-                    snprintf(text, 2048, "%s $%d", upgrade->name.c_str(), upgrade->cost);
+                    snprintf(text, 128, "%s $%d", upgrade->name.c_str(), upgrade->cost);
                 }
 
                 ItemDrawInfo info1(text, 
@@ -1209,12 +1209,12 @@ namespace Mod::MvM::Extended_Upgrades
             }
             else if (upgrade->show_requirements && disabled_reason != "") {
 
-                char text[2048];
+                char text[128];
                 if (upgrade->increment != 0 && max_step < 100000) {
-                    snprintf(text, 2048, "%s: %s (%d/%d) $%d", upgrade->name.c_str(), disabled_reason.c_str(), cur_step, max_step, upgrade->cost);
+                    snprintf(text, 128, "%s: %s (%d/%d) $%d", upgrade->name.c_str(), disabled_reason.c_str(), cur_step, max_step, upgrade->cost);
                 }
                 else { // If increment == 0 or max steps less than 100000, pretend unlimited upgrades
-                    snprintf(text, 2048, "%s: %s $%d", upgrade->name.c_str(), disabled_reason.c_str(), upgrade->cost);
+                    snprintf(text, 128, "%s: %s $%d", upgrade->name.c_str(), disabled_reason.c_str(), upgrade->cost);
                 }
 
                 ItemDrawInfo info1(text, ITEMDRAW_DISABLED);
@@ -1231,7 +1231,7 @@ namespace Mod::MvM::Extended_Upgrades
         }
 
         if(!Mod::Pop::PopMgr_Extensions::ExtendedUpgradesNoUndo()){
-            ItemDrawInfo info1("退款升级");
+            ItemDrawInfo info1("Undo upgrades");
             menu->AppendItem("1000", info1);
         }
         /*if (upgrades.size() == 1) {
@@ -1270,10 +1270,10 @@ namespace Mod::MvM::Extended_Upgrades
         SelectUpgradeWeaponHandler *handler = new SelectUpgradeWeaponHandler(player);
         IBaseMenu *menu = menus->GetDefaultStyle()->CreateMenu(handler, g_Ext.GetIdentity());
         
-        menu->SetDefaultTitle("Extended Upgrades Menu|扩展升级菜单");
+        menu->SetDefaultTitle("Extended Upgrades Menu");
         menu->SetMenuOptionFlags(0);
 
-        ItemDrawInfo info1("Player Upgrades|玩家升级", WeaponHasValidUpgrades(nullptr, player) ? ITEMDRAW_DEFAULT : ITEMDRAW_DISABLED);
+        ItemDrawInfo info1("Player Upgrades", WeaponHasValidUpgrades(nullptr, player) ? ITEMDRAW_DEFAULT : ITEMDRAW_DISABLED);
         menu->AppendItem("player", info1);
 
         for (loadout_positions_t slot : {
@@ -1300,12 +1300,12 @@ namespace Mod::MvM::Extended_Upgrades
         }
 
         static ConVarRef tf_mvm_respec_enabled("tf_mvm_respec_enabled");
-        ItemDrawInfo info2("Refund Upgrades|退款升级", tf_mvm_respec_enabled.GetBool() ? ITEMDRAW_DEFAULT : ITEMDRAW_DISABLED);
+        ItemDrawInfo info2("Refund Upgrades", tf_mvm_respec_enabled.GetBool() ? ITEMDRAW_DEFAULT : ITEMDRAW_DISABLED);
         menu->AppendItem("refund", info2);
 
         if (Mod::Pop::PopMgr_Extensions::HasExtraLoadoutItems(player->GetPlayerClass()->GetClassIndex())) {
             
-            ItemDrawInfo info3("Extra loadout items|自定义物品", ITEMDRAW_DEFAULT);
+            ItemDrawInfo info3("Extra loadout items", ITEMDRAW_DEFAULT);
             menu->AppendItem("extra", info3);
         }
 
@@ -1332,14 +1332,14 @@ namespace Mod::MvM::Extended_Upgrades
     DETOUR_DECL_MEMBER(bool, CPopulationManager_Parse)
 	{
         ClearUpgrades();
-        auto ret = DETOUR_MEMBER_CALL();
+        auto ret = DETOUR_MEMBER_CALL(CPopulationManager_Parse)();
         
         return ret;
     }
 
     DETOUR_DECL_MEMBER(void, CMannVsMachineUpgradeManager_LoadUpgradesFileFromPath, const char *path)
 	{
-        DETOUR_MEMBER_CALL(path);
+        DETOUR_MEMBER_CALL(CMannVsMachineUpgradeManager_LoadUpgradesFileFromPath)(path);
         AddUpgradesToGameList();
     }
 
@@ -1350,7 +1350,7 @@ namespace Mod::MvM::Extended_Upgrades
             return player_is_downgrading || from_buy_upgrade;
         }
 
-        return DETOUR_MEMBER_CALL(player, slot, defindex, upgrade);
+        return DETOUR_MEMBER_CALL(CTFGameRules_CanUpgradeWithAttrib)(player, slot, defindex, upgrade);
     }
 
     DETOUR_DECL_MEMBER(int, CTFGameRules_GetCostForUpgrade, CMannVsMachineUpgrades* upgrade, int slot, int classindex, CTFPlayer *player)
@@ -1358,12 +1358,12 @@ namespace Mod::MvM::Extended_Upgrades
         if (upgrade != nullptr && upgrade->m_iQuality == 9500)
             return upgrade->m_nCost;
 
-        return DETOUR_MEMBER_CALL(upgrade, slot, classindex, player);
+        return DETOUR_MEMBER_CALL(CTFGameRules_GetCostForUpgrade)(upgrade, slot, classindex, player);
     }
 
     DETOUR_DECL_MEMBER_CALL_CONVENTION(__gcc_regcall, unsigned short, CUpgrades_ApplyUpgradeToItem, CTFPlayer* player, CEconItemView *item, int upgrade, int cost, bool downgrade, bool fresh)
 	{
-        attrib_definition_index_t result = DETOUR_MEMBER_CALL(player, item, upgrade, cost, downgrade, fresh);
+        attrib_definition_index_t result = DETOUR_MEMBER_CALL(CUpgrades_ApplyUpgradeToItem)(player, item, upgrade, cost, downgrade, fresh);
         upgrade_success = result != INVALID_ATTRIB_DEF_INDEX;
 
         DevMsg("ApplyUpgradeToItem %d %d %d %d\n", upgrade_success, upgrade, cost, downgrade);
@@ -1395,7 +1395,7 @@ namespace Mod::MvM::Extended_Upgrades
     DETOUR_DECL_MEMBER(int, CTFItemDefinition_GetLoadoutSlot, int classIndex)
 	{
 		CTFItemDefinition *item_def = reinterpret_cast<CTFItemDefinition *>(this);
-		int slot = DETOUR_MEMBER_CALL(classIndex);
+		int slot = DETOUR_MEMBER_CALL(CTFItemDefinition_GetLoadoutSlot)(classIndex);
 		if (rc_CTFPlayerSharedUtils_GetEconItemViewByLoadoutSlot && item_def->m_iItemDefIndex != 0 && slot == -1 && classIndex != TF_CLASS_UNDEFINED) {
         	slot = item_def->GetLoadoutSlot(TF_CLASS_UNDEFINED);
         }
@@ -1406,12 +1406,12 @@ namespace Mod::MvM::Extended_Upgrades
 	{
         SCOPED_INCREMENT(rc_CUpgrades_PlayerPurchasingUpgrade);
         player_is_downgrading = sell;
-		DETOUR_MEMBER_CALL(player, itemslot, upgradeslot, sell, free, b3);
+		DETOUR_MEMBER_CALL(CUpgrades_PlayerPurchasingUpgrade)(player, itemslot, upgradeslot, sell, free, b3);
 	}
 
 	DETOUR_DECL_MEMBER(void, CPopulationManager_RestoreCheckpoint)
 	{
-		DETOUR_MEMBER_CALL();
+		DETOUR_MEMBER_CALL(CPopulationManager_RestoreCheckpoint)();
 
 		bought_upgrades_v2 = bought_upgrades_v2_checkpoint;
 		ForEachTFPlayer([](CTFPlayer *player) {
@@ -1449,7 +1449,7 @@ namespace Mod::MvM::Extended_Upgrades
 
     DETOUR_DECL_MEMBER(void, CPopulationManager_SetCheckpoint, int wave)
 	{
-		DETOUR_MEMBER_CALL(wave);
+		DETOUR_MEMBER_CALL(CPopulationManager_SetCheckpoint)(wave);
         bought_upgrades_v2_checkpoint = bought_upgrades_v2;
 	}
 
@@ -1457,7 +1457,7 @@ namespace Mod::MvM::Extended_Upgrades
 	{
         bought_upgrades_v2_checkpoint.clear();
         bought_upgrades_v2.clear();
-		DETOUR_MEMBER_CALL();
+		DETOUR_MEMBER_CALL(CPopulationManager_ResetMap)();
 	}
 
     RefCount rc_CUpgrades_GrantOrRemoveAllUpgrades;
@@ -1533,14 +1533,14 @@ namespace Mod::MvM::Extended_Upgrades
             }
             bought_upgrades_v2.clear();
         }
-        DETOUR_MEMBER_CALL(player, remove, refund);
+        DETOUR_MEMBER_CALL(CUpgrades_GrantOrRemoveAllUpgrades)(player, remove, refund);
     }
 
     RefCount rc_GetUpgradeStepData;
     DETOUR_DECL_STATIC(CEconItemView *, CTFPlayerSharedUtils_GetEconItemViewByLoadoutSlot, CTFPlayer *player, int slot, CEconEntity **entity)
 	{
         SCOPED_INCREMENT(rc_CTFPlayerSharedUtils_GetEconItemViewByLoadoutSlot);
-        auto result = DETOUR_STATIC_CALL(player, slot, entity);
+        auto result = DETOUR_STATIC_CALL(CTFPlayerSharedUtils_GetEconItemViewByLoadoutSlot)(player, slot, entity);
         if (rc_GetUpgradeStepData && entity != nullptr && rtti_cast<CTFPowerupBottle *>(*entity) != nullptr) {
             *entity = nullptr;
         }
@@ -1574,7 +1574,7 @@ namespace Mod::MvM::Extended_Upgrades
                 }
             }
         }
-		auto result = DETOUR_STATIC_CALL(player, slot, upgrade, cur_step, over_cap);
+		auto result = DETOUR_STATIC_CALL(GetUpgradeStepData)(player, slot, upgrade, cur_step, over_cap);
         // To reduce refund execution time, only count steps that are bought for the item
         if (rc_CUpgrades_GrantOrRemoveAllUpgrades && result > cur_step) {
             return cur_step;
@@ -1612,14 +1612,14 @@ namespace Mod::MvM::Extended_Upgrades
             }
             return INVALID_ATTRIB_DEF_INDEX;
         }
-        return DETOUR_STATIC_CALL(upgrade, pTFPlayer, pEconItemView, nCost, bDowngrade);
+        return DETOUR_STATIC_CALL(ApplyUpgrade_Default)(upgrade, pTFPlayer, pEconItemView, nCost, bDowngrade);
     }
     DETOUR_DECL_MEMBER(void, CTFPlayer_GiveDefaultItems)
 	{
 		if (rc_CUpgrades_PlayerPurchasingUpgrade > 0 && buying_upgrade) {
             return;
         }
-        DETOUR_MEMBER_CALL();
+        DETOUR_MEMBER_CALL(CTFPlayer_GiveDefaultItems)();
     }
 
 	class CMod : public IMod, public IModCallbackListener, public IFrameUpdatePostEntityThinkListener

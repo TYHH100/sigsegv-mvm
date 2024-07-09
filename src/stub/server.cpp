@@ -4,10 +4,10 @@
 GlobalThunk<CHLTVServer *> hltv("hltv");
 GlobalThunk<CHostState>	g_HostState("g_HostState");
 
-MemberFuncThunk<CClientFrameManager *, int> CClientFrameManager::ft_CountClientFrames("CClientFrameManager::CountClientFrames");
-MemberFuncThunk<CClientFrameManager *, void> CClientFrameManager::ft_RemoveOldestFrame("CClientFrameManager::RemoveOldestFrame");
-
 MemberFuncThunk<CHLTVServer *, void, CBaseClient *> CHLTVServer::ft_StartMaster("CHLTVServer::StartMaster");
+MemberFuncThunk<CHLTVServer *, int> CHLTVServer::ft_CountClientFrames("CClientFrameManager::CountClientFrames");
+MemberFuncThunk<CHLTVServer *, void> CHLTVServer::ft_RemoveOldestFrame("CClientFrameManager::RemoveOldestFrame");
+
 
 MemberFuncThunk<CBaseServer *, CBaseClient *, const char *> CBaseServer::ft_CreateFakeClient("CBaseServer::CreateFakeClient");
 
@@ -25,5 +25,3 @@ MemberFuncThunk<CGameClient *, CClientFrame *>         CGameClient::ft_GetSendFr
 
 MemberFuncThunk<CNetworkStringTable *, void, int>              CNetworkStringTable::ft_UpdateMirrorTable("CNetworkStringTable::UpdateMirrorTable");
 MemberFuncThunk<CNetworkStringTable *, void>                   CNetworkStringTable::ft_DeleteAllStrings("CNetworkStringTable::DeleteAllStrings");
-
-MemberFuncThunk<CNetChan *, bool, const char *> CNetChan::ft_IsFileInWaitingList("CNetChan::IsFileInWaitingList");

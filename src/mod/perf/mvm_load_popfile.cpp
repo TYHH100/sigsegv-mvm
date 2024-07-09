@@ -12,40 +12,40 @@ namespace Mod::Perf::MvM_Load_Popfile
     {
 		SCOPED_INCREMENT(rc_CPopulationManager_SetPopulationFilename);
 		TFObjectiveResource()->m_iszMvMPopfileName = AllocPooledString(filename);
-        DETOUR_MEMBER_CALL(filename);
+        DETOUR_MEMBER_CALL(CPopulationManager_SetPopulationFilename)(filename);
     }
 
 	RefCount rc_tf_mvm_popfile;
 	DETOUR_DECL_STATIC(void, tf_mvm_popfile, const CCommand& args)
 	{
 		SCOPED_INCREMENT(rc_tf_mvm_popfile);
-		DETOUR_STATIC_CALL(args);
+		DETOUR_STATIC_CALL(tf_mvm_popfile)(args);
 	}
 	
 	DETOUR_DECL_MEMBER(void, CPopulationManager_ResetMap)
 	{
 		if (rc_tf_mvm_popfile > 0 && rc_CPopulationManager_SetPopulationFilename == 0) return;
-		DETOUR_MEMBER_CALL();
+		DETOUR_MEMBER_CALL(CPopulationManager_ResetMap)();
 	}
 	
 	RefCount rc_CPopulationManager_JumpToWave;
 	DETOUR_DECL_MEMBER(void, CPopulationManager_JumpToWave, unsigned int wave, float f1)
 	{
 		SCOPED_INCREMENT_IF(rc_CPopulationManager_JumpToWave, f1 == 0);
-		DETOUR_MEMBER_CALL(wave, f1);
+		DETOUR_MEMBER_CALL(CPopulationManager_JumpToWave)(wave, f1);
 	}
 	
 	RefCount rc_CTFGameRules_SetupOnRoundStart;
 	DETOUR_DECL_MEMBER(void, CTFGameRules_SetupOnRoundStart)
 	{
 		SCOPED_INCREMENT(rc_CTFGameRules_SetupOnRoundStart);
-		DETOUR_MEMBER_CALL();
+		DETOUR_MEMBER_CALL(CTFGameRules_SetupOnRoundStart)();
 	}
 
 	DETOUR_DECL_MEMBER(bool, CPopulationManager_Parse)
 	{
 		if (rc_CPopulationManager_JumpToWave > 0 && rc_CTFGameRules_SetupOnRoundStart == 0) return true;
-		return DETOUR_MEMBER_CALL();
+		return DETOUR_MEMBER_CALL(CPopulationManager_Parse)();
 	}
 
 	class CMod : public IMod

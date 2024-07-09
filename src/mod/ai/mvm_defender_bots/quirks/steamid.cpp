@@ -151,7 +151,7 @@ namespace Mod::AI::MvM_Defender_Bots
 			}
 		}
 		
-		return DETOUR_MEMBER_CALL(pID);
+		return DETOUR_MEMBER_CALL(CBasePlayer_GetSteamID)(pID);
 	}
 	
 	
