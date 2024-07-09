@@ -18,28 +18,28 @@ extern std::map<int, std::string> g_AttribnamesShort;
 static const char *loadoutStrings[] = 
 {
     // Weapons & Equipment
-    "Ö÷ÎäÆ÷",		// LOADOUT_POSITION_PRIMARY = 0,
-    "¸±ÎäÆ÷",	    // LOADOUT_POSITION_SECONDARY,
-    "½üÕ½ÎäÆ÷",		// LOADOUT_POSITION_MELEE,
+    "ä¸»æ­¦å™¨",		// LOADOUT_POSITION_PRIMARY = 0,
+    "å‰¯æ­¦å™¨",	    // LOADOUT_POSITION_SECONDARY,
+    "è¿‘æˆ˜æ­¦å™¨",		// LOADOUT_POSITION_MELEE,
     "Utility",		// LOADOUT_POSITION_UTILITY,
-    "½¨Öþ",		    // LOADOUT_POSITION_BUILDING,
+    "å»ºç­‘",		    // LOADOUT_POSITION_BUILDING,
     "PDA",			// LOADOUT_POSITION_PDA,
     "PDA 2",		// LOADOUT_POSITION_PDA2,
 
     // Wearables
-    "Í·²¿ÊÎÆ·",		// LOADOUT_POSITION_HEAD,
-    "ÉíÌåÊÎÆ·1",	// LOADOUT_POSITION_MISC,
-    "¶¯×÷",		    // LOADOUT_POSITION_ACTION,
-    "ÉíÌåÊÎÆ·2",   	// LOADOUT_POSITION_MISC2
+    "å¤´éƒ¨é¥°å“",		// LOADOUT_POSITION_HEAD,
+    "èº«ä½“é¥°å“1",	// LOADOUT_POSITION_MISC,
+    "åŠ¨ä½œ",		    // LOADOUT_POSITION_ACTION,
+    "èº«ä½“é¥°å“2",   	// LOADOUT_POSITION_MISC2
 
-    "1ºÅ³°·í",		// LOADOUT_POSITION_TAUNT
-    "2ºÅ³°·í",		// LOADOUT_POSITION_TAUNT2
-    "3ºÅ³°·í",		// LOADOUT_POSITION_TAUNT3
-    "4ºÅ³°·í",		// LOADOUT_POSITION_TAUNT4
-    "5ºÅ³°·í",		// LOADOUT_POSITION_TAUNT5
-    "6ºÅ³°·í",		// LOADOUT_POSITION_TAUNT6
-    "7ºÅ³°·í",		// LOADOUT_POSITION_TAUNT7
-    "8ºÅ³°·í",		// LOADOUT_POSITION_TAUNT8
+    "1å·å˜²è®½",		// LOADOUT_POSITION_TAUNT
+    "2å·å˜²è®½",		// LOADOUT_POSITION_TAUNT2
+    "3å·å˜²è®½",		// LOADOUT_POSITION_TAUNT3
+    "4å·å˜²è®½",		// LOADOUT_POSITION_TAUNT4
+    "5å·å˜²è®½",		// LOADOUT_POSITION_TAUNT5
+    "6å·å˜²è®½",		// LOADOUT_POSITION_TAUNT6
+    "7å·å˜²è®½",		// LOADOUT_POSITION_TAUNT7
+    "8å·å˜²è®½",		// LOADOUT_POSITION_TAUNT8
 };
 	
 static int GetSlotFromString(const char *string) {

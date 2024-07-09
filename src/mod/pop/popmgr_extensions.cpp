@@ -175,7 +175,7 @@ namespace Mod::Pop::PopMgr_Extensions
 				TFGameRules()->SetCustomUpgradesFile(convalue.c_str());
 				if (force && last_custom_upgrades != convalue) {
 					received_message_tick = true;
-					PrintToChatAll("\x07""ffb200>µ±Ç°ÈÎÎñÕýÔÚÊ¹ÓÃ×Ô¶¨ÒåÉý¼¶.È·±£ÄãÔÚÉèÖÃÖÐÆôÓÃÁËÏÂÔØ(ÏÂÔØÈ«²¿ÎÄ¼þ£¬»òÏÂÔØ³ýÒôÆµÖ®ÍâµÄÎÄ¼þ).");
+					PrintToChatAll("\x07""ffb200>å½“å‰ä»»åŠ¡æ­£åœ¨ä½¿ç”¨è‡ªå®šä¹‰å‡çº§.ç¡®ä¿ä½ åœ¨è®¾ç½®ä¸­å¯ç”¨äº†ä¸‹è½½(ä¸‹è½½å…¨éƒ¨æ–‡ä»¶ï¼Œæˆ–ä¸‹è½½é™¤éŸ³é¢‘ä¹‹å¤–çš„æ–‡ä»¶).");
 				}
 				last_custom_upgrades = convalue;
 			}
@@ -2158,7 +2158,7 @@ namespace Mod::Pop::PopMgr_Extensions
 			CONVAR_SCOPE_VALUE(tf_mvm_endless_force_on, 1);
 			
 			if (state.m_bSingleClassAllowed != -1) {
-				gamehelpers->TextMsg(ENTINDEX(player), TEXTMSG_DEST_CENTER, CFmtStr("%s %s %s", "Ö»ÔÊÐí",g_aRawPlayerClassNames[state.m_bSingleClassAllowed],"±øÖÖÔÚµ±Ç°ÈÎÎñ"));
+				gamehelpers->TextMsg(ENTINDEX(player), TEXTMSG_DEST_CENTER, CFmtStr("%s %s %s", "åªå…è®¸",g_aRawPlayerClassNames[state.m_bSingleClassAllowed],"å…µç§åœ¨å½“å‰ä»»åŠ¡"));
 
 				player->HandleCommand_JoinClass(g_aRawPlayerClassNames[state.m_bSingleClassAllowed]);
 
@@ -2245,7 +2245,7 @@ namespace Mod::Pop::PopMgr_Extensions
         void *menu = nullptr;
         if (menus->GetDefaultStyle()->GetClientMenu(ENTINDEX(player), &menu) == MenuSource_BaseMenu && menu != nullptr) {
 			auto title = ((IBaseMenu *)menu)->GetDefaultTitle();
-			if (title != nullptr && StringStartsWith(title, "¶îÍâ¿ÉÑ¡ÎïÆ·")) {
+			if (title != nullptr && StringStartsWith(title, "é¢å¤–å¯é€‰ç‰©å“")) {
 				CancelClientMenu(player);
 			}
 		}
@@ -2332,7 +2332,7 @@ namespace Mod::Pop::PopMgr_Extensions
 		DevMsg("Pass send\n");
 
 		if (state.m_ExtraLoadoutItemsNotify)
-			PrintToChat("\x07""7fd4ff>µ±Ç°ÈÎÎñ¿ÉÒÔ×°±¸×Ô¶¨ÒåÎïÆ·,ÊäÈë!missionitems²é¿´ÄãÓÎÍæ±øÖÖ¿ÉÓÃµÄÎïÆ·.\n",player);
+			PrintToChat("\x07""7fd4ff>å½“å‰ä»»åŠ¡å¯ä»¥è£…å¤‡è‡ªå®šä¹‰ç‰©å“,è¾“å…¥!missionitemsæŸ¥çœ‹ä½ æ¸¸çŽ©å…µç§å¯ç”¨çš„ç‰©å“.\n",player);
 
 		//auto explanation = Mod::Pop::Wave_Extensions::GetWaveExplanation(0);
 		
@@ -2362,7 +2362,7 @@ namespace Mod::Pop::PopMgr_Extensions
 			state.m_SandmanStuns.Get() ||
 			state.m_bNoReanimators
 		)) { 
-			PrintToChat("\x07""7fd4ff>ÊäÈë!missioninfoÒÔ²é¿´×Ô¶¨ÒåÈÎÎñÐÅÏ¢.\n",player);
+			PrintToChat("\x07""7fd4ff>è¾“å…¥!missioninfoä»¥æŸ¥çœ‹è‡ªå®šä¹‰ä»»åŠ¡ä¿¡æ¯.\n",player);
 		}
 	}
 
@@ -2432,7 +2432,7 @@ namespace Mod::Pop::PopMgr_Extensions
 				state.m_PlayerUpgradeSend.insert(player);
 				ResendUpgradeFile(false);
 				if (!received_message_tick) {
-					PrintToChat("\x07""ffb200>µ±Ç°ÈÎÎñÕýÔÚÊ¹ÓÃ×Ô¶¨ÒåÉý¼¶.È·±£ÄãÔÚÉèÖÃÖÐÆôÓÃÁËÏÂÔØ(ÏÂÔØÈ«²¿ÎÄ¼þ£¬»òÏÂÔØ³ýÒôÆµÖ®ÍâµÄÎÄ¼þ).\n",player);
+					PrintToChat("\x07""ffb200>å½“å‰ä»»åŠ¡æ­£åœ¨ä½¿ç”¨è‡ªå®šä¹‰å‡çº§.ç¡®ä¿ä½ åœ¨è®¾ç½®ä¸­å¯ç”¨äº†ä¸‹è½½(ä¸‹è½½å…¨éƒ¨æ–‡ä»¶ï¼Œæˆ–ä¸‹è½½é™¤éŸ³é¢‘ä¹‹å¤–çš„æ–‡ä»¶).\n",player);
 					
 				}
 			}
@@ -3635,25 +3635,25 @@ namespace Mod::Pop::PopMgr_Extensions
         IBaseMenu *menu = menus->GetDefaultStyle()->CreateMenu(handler, g_Ext.GetIdentity());
         
 		DevMsg("Mission Menu\n");
-        menu->SetDefaultTitle("ÈÎÎñÐÅÏ¢Ãæ°å");
+        menu->SetDefaultTitle("ä»»åŠ¡ä¿¡æ¯é¢æ¿");
         menu->SetMenuOptionFlags(MENUFLAG_BUTTON_EXIT);
 
 		if (!state.m_bNoMissionInfo) {
 			auto explanation = Mod::Pop::Wave_Extensions::GetWaveExplanation(0);
 			if (explanation != nullptr && !explanation->empty()) {
-				ItemDrawInfo info1("ÈÎÎñ½éÉÜ", ITEMDRAW_DEFAULT);
+				ItemDrawInfo info1("ä»»åŠ¡ä»‹ç»", ITEMDRAW_DEFAULT);
 				menu->AppendItem("description", info1);
 			}
 			if (!state.m_ItemWhitelist.empty()) {
-				ItemDrawInfo info1("ÎïÆ·°×Ãûµ¥", ITEMDRAW_DEFAULT);
+				ItemDrawInfo info1("ç‰©å“ç™½åå•", ITEMDRAW_DEFAULT);
 				menu->AppendItem("whitelist", info1);
 			}
 			if (!state.m_ItemBlacklist.empty()) {
-				ItemDrawInfo info1("ÎïÆ·ºÚÃûµ¥", ITEMDRAW_DEFAULT);
+				ItemDrawInfo info1("ç‰©å“é»‘åå•", ITEMDRAW_DEFAULT);
 				menu->AppendItem("blacklist", info1);
 			}
 			if (!state.m_ItemAttributes.empty()) {
-				ItemDrawInfo info1("ÐÞ¸Ä¹ýµÄÎïÆ·ÊôÐÔ", ITEMDRAW_DEFAULT);
+				ItemDrawInfo info1("ä¿®æ”¹è¿‡çš„ç‰©å“å±žæ€§", ITEMDRAW_DEFAULT);
 				menu->AppendItem("itemattributes", info1);
 			}
 			bool player_empty = state.m_PlayerAttributes.empty();
@@ -3664,35 +3664,35 @@ namespace Mod::Pop::PopMgr_Extensions
 				}
 			}
 			if (!player_empty) {
-				ItemDrawInfo info1("Íæ¼ÒÊôÐÔ", ITEMDRAW_DEFAULT);
+				ItemDrawInfo info1("çŽ©å®¶å±žæ€§", ITEMDRAW_DEFAULT);
 				menu->AppendItem("playerattributes", info1);
 			}
 			if (!state.m_DisallowedUpgrades.empty()) {
-				ItemDrawInfo info1("±»½ûÓÃµÄÉý¼¶", ITEMDRAW_DEFAULT);
+				ItemDrawInfo info1("è¢«ç¦ç”¨çš„å‡çº§", ITEMDRAW_DEFAULT);
 				menu->AppendItem("disallowedupgrades", info1);
 			}
 			if (!state.m_ItemReplace.empty()) {
-				ItemDrawInfo info1("ÎïÆ·Ìæ»»", ITEMDRAW_DEFAULT);
+				ItemDrawInfo info1("ç‰©å“æ›¿æ¢", ITEMDRAW_DEFAULT);
 				menu->AppendItem("itemreplace", info1);
 			}
 			if (!state.m_ExtraLoadoutItems.empty()) {
-				ItemDrawInfo info1("¶îÍâ¿ÉÑ¡ÎïÆ·", ITEMDRAW_DEFAULT);
+				ItemDrawInfo info1("é¢å¤–å¯é€‰ç‰©å“", ITEMDRAW_DEFAULT);
 				menu->AppendItem("extraloadoutitems", info1);
 			}
 			if (state.m_ForceItems.parsed) {
-				ItemDrawInfo info1("Ç¿ÖÆ×°±¸µÄÎïÆ·", ITEMDRAW_DEFAULT);
+				ItemDrawInfo info1("å¼ºåˆ¶è£…å¤‡çš„ç‰©å“", ITEMDRAW_DEFAULT);
 				menu->AppendItem("forceditems", info1);
 			}
 			if (state.m_bSniperAllowHeadshots) {
-				ItemDrawInfo info1("Sniper bots ¿ÉÒÔ±¬Í·", ITEMDRAW_DISABLED);
+				ItemDrawInfo info1("Sniper bots å¯ä»¥çˆ†å¤´", ITEMDRAW_DISABLED);
 				menu->AppendItem("", info1);
 			}
 			if (state.m_bSniperHideLasers) {
-				ItemDrawInfo info1("Sniper bots Ã»ÓÐ¼¤¹âÃé×¼Ïß", ITEMDRAW_DISABLED);
+				ItemDrawInfo info1("Sniper bots æ²¡æœ‰æ¿€å…‰çž„å‡†çº¿", ITEMDRAW_DISABLED);
 				menu->AppendItem("", info1);
 			}
 			if (!state.m_RespecEnabled.Get()) {
-				ItemDrawInfo info1("ÒÑ½ûÓÃÉý¼¶ÍË¿î", ITEMDRAW_DISABLED);
+				ItemDrawInfo info1("å·²ç¦ç”¨å‡çº§é€€æ¬¾", ITEMDRAW_DISABLED);
 				menu->AppendItem("", info1);
 			}
 			if (state.m_RespecLimit.Get() != 0) {
@@ -3701,26 +3701,26 @@ namespace Mod::Pop::PopMgr_Extensions
 				menu->AppendItem("", info1);
 			}
 			if (state.m_ImprovedAirblast.Get()) {
-				ItemDrawInfo info1("Pyro bots »áÆø±¬·ÉÐÐÎïs", ITEMDRAW_DISABLED);
+				ItemDrawInfo info1("Pyro bots ä¼šæ°”çˆ†é£žè¡Œç‰©s", ITEMDRAW_DISABLED);
 				menu->AppendItem("", info1);
 			}
 			if (state.m_SandmanStuns.Get()) {
-				ItemDrawInfo info1("Ë¯Ä§µÄÇò¿ÉÒÔ»÷ÔÎ", ITEMDRAW_DISABLED);
+				ItemDrawInfo info1("ç¡é­”çš„çƒå¯ä»¥å‡»æ™•", ITEMDRAW_DISABLED);
 				menu->AppendItem("", info1);
 			}
 			if (state.m_bNoReanimators) {
-				ItemDrawInfo info1("Ã»ÓÐ¸´»î±ê¼Ç", ITEMDRAW_DISABLED);
+				ItemDrawInfo info1("æ²¡æœ‰å¤æ´»æ ‡è®°", ITEMDRAW_DISABLED);
 				menu->AppendItem("", info1);
 			}
 			
 		}
-		DevMsg("ÎïÆ·ÊýÁ¿ %d\n", menu->GetItemCount());
+		DevMsg("ç‰©å“æ•°é‡ %d\n", menu->GetItemCount());
 		if (menu->GetItemCount() == 1) {
             ItemDrawInfo info1(" ", ITEMDRAW_NOTEXT);
             menu->AppendItem(" ", info1);
         }
 		else if (menu->GetItemCount() == 0) {
-            ItemDrawInfo info1("Ã»ÓÐ×Ô¶¨ÒåÈÎÎñÐÅÏ¢", ITEMDRAW_DISABLED);
+            ItemDrawInfo info1("æ²¡æœ‰è‡ªå®šä¹‰ä»»åŠ¡ä¿¡æ¯", ITEMDRAW_DISABLED);
             menu->AppendItem(" ", info1);
             ItemDrawInfo info2(" ", ITEMDRAW_NOTEXT);
             menu->AppendItem(" ", info2);
@@ -3734,7 +3734,7 @@ namespace Mod::Pop::PopMgr_Extensions
 		SelectMissionInfoHandler *handler = new SelectMissionInfoHandler(player);
         IBaseMenu *menu = menus->GetDefaultStyle()->CreateMenu(handler, g_Ext.GetIdentity());
         
-        menu->SetDefaultTitle("ÎïÆ·°×Ãûµ¥");
+        menu->SetDefaultTitle("ç‰©å“ç™½åå•");
         menu->SetMenuOptionFlags(MENUFLAG_BUTTON_EXIT);
 
 		for (const auto& entry : state.m_ItemWhitelist) {
@@ -3751,7 +3751,7 @@ namespace Mod::Pop::PopMgr_Extensions
 		SelectMissionInfoHandler *handler = new SelectMissionInfoHandler(player);
         IBaseMenu *menu = menus->GetDefaultStyle()->CreateMenu(handler, g_Ext.GetIdentity());
         
-        menu->SetDefaultTitle("ÎïÆ·ºÚÃûµ¥");
+        menu->SetDefaultTitle("ç‰©å“é»‘åå•");
         menu->SetMenuOptionFlags(MENUFLAG_BUTTON_EXIT);
 
 		for (const auto& entry : state.m_ItemBlacklist) {
@@ -3768,7 +3768,7 @@ namespace Mod::Pop::PopMgr_Extensions
 		SelectMissionInfoHandler *handler = new SelectMissionInfoHandler(player);
         IBaseMenu *menu = menus->GetDefaultStyle()->CreateMenu(handler, g_Ext.GetIdentity());
         
-        menu->SetDefaultTitle("ÎïÆ·Ìæ»»");
+        menu->SetDefaultTitle("ç‰©å“æ›¿æ¢");
         menu->SetMenuOptionFlags(MENUFLAG_BUTTON_EXIT);
 
 		for (const auto& entry : state.m_ItemReplace) {
@@ -3787,7 +3787,7 @@ namespace Mod::Pop::PopMgr_Extensions
 		SelectMissionInfoHandler *handler = new SelectMissionInfoHandler(player);
         IBaseMenu *menu = menus->GetDefaultStyle()->CreateMenu(handler, g_Ext.GetIdentity());
         
-        menu->SetDefaultTitle("ÎïÆ·Ìæ»»");
+        menu->SetDefaultTitle("ç‰©å“æ›¿æ¢");
         menu->SetMenuOptionFlags(MENUFLAG_BUTTON_EXIT);
 
 		auto res = TFObjectiveResource();
@@ -3823,7 +3823,7 @@ namespace Mod::Pop::PopMgr_Extensions
 		SelectMissionInfoHandler *handler = new SelectMissionInfoHandler(player);
         IBaseMenu *menu = menus->GetDefaultStyle()->CreateMenu(handler, g_Ext.GetIdentity());
         
-        menu->SetDefaultTitle("±»½ûÓÃµÄÉý¼¶");
+        menu->SetDefaultTitle("è¢«ç¦ç”¨çš„å‡çº§");
         menu->SetMenuOptionFlags(MENUFLAG_BUTTON_EXIT);
 
 		for (const auto& entry : state.m_DisallowedUpgrades) {
@@ -3848,7 +3848,7 @@ namespace Mod::Pop::PopMgr_Extensions
 		SelectItemAttributeHandler *handler = new SelectItemAttributeHandler(player);
         IBaseMenu *menu = menus->GetDefaultStyle()->CreateMenu(handler, g_Ext.GetIdentity());
         
-        menu->SetDefaultTitle("ÎïÆ·ÊôÐÔ");
+        menu->SetDefaultTitle("ç‰©å“å±žæ€§");
         menu->SetMenuOptionFlags(MENUFLAG_BUTTON_EXIT);
 
 		int i = 0;
@@ -3896,7 +3896,7 @@ namespace Mod::Pop::PopMgr_Extensions
 		SelectPlayerAttributeHandler *handler = new SelectPlayerAttributeHandler(player);
         IBaseMenu *menu = menus->GetDefaultStyle()->CreateMenu(handler, g_Ext.GetIdentity());
         
-        menu->SetDefaultTitle("Íæ¼ÒÊôÐÔ");
+        menu->SetDefaultTitle("çŽ©å®¶å±žæ€§");
         menu->SetMenuOptionFlags(MENUFLAG_BUTTON_EXIT);
 
 		if (!state.m_PlayerAttributes.empty())
@@ -3922,7 +3922,7 @@ namespace Mod::Pop::PopMgr_Extensions
         IBaseMenu *menu = menus->GetDefaultStyle()->CreateMenu(handler, g_Ext.GetIdentity());
         
 		if (id == 0) {
-			menu->SetDefaultTitle("È«ÌåÍæ¼ÒÊôÐÔ");
+			menu->SetDefaultTitle("å…¨ä½“çŽ©å®¶å±žæ€§");
 		}
 		else {
         	menu->SetDefaultTitle(CFmtStr("%s Attributes", g_aPlayerClassNames_NonLocalized[id]));
@@ -3955,7 +3955,7 @@ namespace Mod::Pop::PopMgr_Extensions
 		SelectForcedItemsClassInfoHandler *handler = new SelectForcedItemsClassInfoHandler(player);
         IBaseMenu *menu = menus->GetDefaultStyle()->CreateMenu(handler, g_Ext.GetIdentity());
         
-        menu->SetDefaultTitle("Ç¿ÖÆ×°±¸µÄÎïÆ·");
+        menu->SetDefaultTitle("å¼ºåˆ¶è£…å¤‡çš„ç‰©å“");
         menu->SetMenuOptionFlags(MENUFLAG_BUTTON_EXIT);
 
 		bool has_class[TF_CLASS_COUNT] = {0};
@@ -3989,7 +3989,7 @@ namespace Mod::Pop::PopMgr_Extensions
 		SelectForcedItemsInfoHandler *handler = new SelectForcedItemsInfoHandler(player);
         IBaseMenu *menu = menus->GetDefaultStyle()->CreateMenu(handler, g_Ext.GetIdentity());
         
-        menu->SetDefaultTitle(CFmtStr("Ç¿ÖÆ×°±¸µÄÎïÆ· (%s)", g_aPlayerClassNames_NonLocalized[id]));
+        menu->SetDefaultTitle(CFmtStr("å¼ºåˆ¶è£…å¤‡çš„ç‰©å“ (%s)", g_aPlayerClassNames_NonLocalized[id]));
         menu->SetMenuOptionFlags(MENUFLAG_BUTTON_EXIT);
 
 		for (auto &items_class : {state.m_ForceItems.items, state.m_ForceItems.items_no_remove}) {
@@ -4012,7 +4012,7 @@ namespace Mod::Pop::PopMgr_Extensions
 		SelectExtraLoadoutItemsClassInfoHandler *handler = new SelectExtraLoadoutItemsClassInfoHandler(player);
         IBaseMenu *menu = menus->GetDefaultStyle()->CreateMenu(handler, g_Ext.GetIdentity());
         
-        menu->SetDefaultTitle("¶îÍâ¿ÉÑ¡ÎïÆ·");
+        menu->SetDefaultTitle("é¢å¤–å¯é€‰ç‰©å“");
         menu->SetMenuOptionFlags(MENUFLAG_BUTTON_EXIT);
 
 		bool has_class[TF_CLASS_COUNT] = {0};
@@ -4045,7 +4045,7 @@ namespace Mod::Pop::PopMgr_Extensions
 		SelectExtraLoadoutItemsInfoHandler *handler = new SelectExtraLoadoutItemsInfoHandler(player);
         IBaseMenu *menu = menus->GetDefaultStyle()->CreateMenu(handler, g_Ext.GetIdentity());
         
-        menu->SetDefaultTitle(CFmtStr("¶îÍâ¿ÉÑ¡ÎïÆ· (%s)", g_aPlayerClassNames_NonLocalized[id]));
+        menu->SetDefaultTitle(CFmtStr("é¢å¤–å¯é€‰ç‰©å“ (%s)", g_aPlayerClassNames_NonLocalized[id]));
         menu->SetMenuOptionFlags(MENUFLAG_BUTTON_EXIT);
 
 		for (size_t i = 0; i < state.m_ExtraLoadoutItems.size(); i++) {
@@ -4103,7 +4103,7 @@ namespace Mod::Pop::PopMgr_Extensions
 		SelectExtraLoadoutItemsClassHandler *handler = new SelectExtraLoadoutItemsClassHandler(player, autoHide);
         IBaseMenu *menu = menus->GetDefaultStyle()->CreateMenu(handler, g_Ext.GetIdentity());
         
-        menu->SetDefaultTitle("¶îÍâ¿ÉÑ¡ÎïÆ·");
+        menu->SetDefaultTitle("é¢å¤–å¯é€‰ç‰©å“");
         menu->SetMenuOptionFlags(MENUFLAG_BUTTON_EXIT);
 
 		bool has_class[TF_CLASS_COUNT] = {0};
@@ -4140,7 +4140,7 @@ namespace Mod::Pop::PopMgr_Extensions
             menu->AppendItem(" ", info1);
         }
 		else if (menu->GetItemCount() == 0) {
-            ItemDrawInfo info1(hasHidden ? "No extra loadout items currently available" : "¸ÃÈÎÎñÃ»ÓÐ¶îÍâ¿ÉÓÃÎïÆ·.", ITEMDRAW_DISABLED);
+            ItemDrawInfo info1(hasHidden ? "No extra loadout items currently available" : "è¯¥ä»»åŠ¡æ²¡æœ‰é¢å¤–å¯ç”¨ç‰©å“.", ITEMDRAW_DISABLED);
             menu->AppendItem(" ", info1);
             ItemDrawInfo info2(" ", ITEMDRAW_NOTEXT);
             menu->AppendItem(" ", info2);
@@ -4158,7 +4158,7 @@ namespace Mod::Pop::PopMgr_Extensions
 		SelectExtraLoadoutItemsHandler *handler = new SelectExtraLoadoutItemsHandler(player, autoHide);
         IBaseMenu *menu = menus->GetDefaultStyle()->CreateMenu(handler, g_Ext.GetIdentity());
         
-        menu->SetDefaultTitle(CFmtStr("¶îÍâ¿ÉÑ¡ÎïÆ· (%s)", g_aPlayerClassNames_NonLocalized[class_index]));
+        menu->SetDefaultTitle(CFmtStr("é¢å¤–å¯é€‰ç‰©å“ (%s)", g_aPlayerClassNames_NonLocalized[class_index]));
         menu->SetMenuOptionFlags(MENUFLAG_BUTTON_EXIT);
 
 		int wave = TFObjectiveResource()->m_nMannVsMachineWaveCount;
@@ -4180,7 +4180,7 @@ namespace Mod::Pop::PopMgr_Extensions
 				}
 
 				char buf[256];
-				snprintf(buf, sizeof(buf), "%s: %s %s %s", loadoutStrings[item.loadout_slot], item.name.c_str(), cost, selected ? "(ÒÑÑ¡ÖÐ)" : "");
+				snprintf(buf, sizeof(buf), "%s: %s %s %s", loadoutStrings[item.loadout_slot], item.name.c_str(), cost, selected ? "(å·²é€‰ä¸­)" : "");
 				ItemDrawInfo info1(buf, ITEMDRAW_DEFAULT);
 				std::string num = std::to_string(i);
 				menu->AppendItem(num.c_str(), info1);
@@ -4229,25 +4229,25 @@ namespace Mod::Pop::PopMgr_Extensions
 		player->GetSteamID(&steamid);
 		if (!state.m_BoughtLoadoutItems[steamid].count(itemId)) {
 			char buf[256];
-			snprintf(buf, sizeof(buf), "¹ºÂò ($%d)", item.cost);
+			snprintf(buf, sizeof(buf), "è´­ä¹° ($%d)", item.cost);
 			ItemDrawInfo info1(buf, player->GetCurrency() >= item.cost ? ITEMDRAW_DEFAULT : ITEMDRAW_DISABLED);
 			menu->AppendItem("Buy", info1);
 		}
 
 		if (state.m_BoughtLoadoutItems[steamid].count(itemId)) {
 			if (state.m_SelectedLoadoutItems[steamid].count(itemId)) {
-				ItemDrawInfo info1("È¡Ïû×°±¸", ITEMDRAW_DEFAULT);
+				ItemDrawInfo info1("å–æ¶ˆè£…å¤‡", ITEMDRAW_DEFAULT);
 				menu->AppendItem("Unequip", info1);
 			}
 			else {
-				ItemDrawInfo info1("È¡Ïû×°±¸", ITEMDRAW_DEFAULT);
+				ItemDrawInfo info1("å–æ¶ˆè£…å¤‡", ITEMDRAW_DEFAULT);
 				menu->AppendItem("Equip", info1);
 			}
 
 			if (item.allow_refund) {
 				char buf[256];
-				snprintf(buf, sizeof(buf), "ÊÛ³ö ($%d)", item.cost);
-				ItemDrawInfo info2("ÊÛ³ö", ITEMDRAW_DEFAULT);
+				snprintf(buf, sizeof(buf), "å”®å‡º ($%d)", item.cost);
+				ItemDrawInfo info2("å”®å‡º", ITEMDRAW_DEFAULT);
 				menu->AppendItem("Sell", info2);
 			}
 		}

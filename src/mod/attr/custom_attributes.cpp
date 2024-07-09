@@ -8331,7 +8331,7 @@ namespace Mod::Attr::Custom_Attributes
 				if (item_def != nullptr)
 					format_str.insert(0, CFmtStr("\n%s:\n\n", GetItemNameForDisplay(item_def)));
 				else
-					format_str.insert(0, "\n人物属:\n\n");
+					format_str.insert(0, "\n人物属性:\n\n");
 
 				added_item_name = true;
 			}

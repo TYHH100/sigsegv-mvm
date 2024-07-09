@@ -432,7 +432,7 @@ namespace Mod::MvM::Extended_Upgrades
         void *menu = nullptr;
         if (menus->GetDefaultStyle()->GetClientMenu(ENTINDEX(player), &menu) == MenuSource_BaseMenu && menu != nullptr) {
             auto title = ((IBaseMenu *)menu)->GetDefaultTitle();
-            return title != nullptr && (FStrEq(title, "Íæ¼ÒÉý¼¶") || FStrEq(title, "Extended Upgrades Menu") || StringStartsWith(title, "Upgrades for"));
+            return title != nullptr && (FStrEq(title, "çŽ©å®¶å‡çº§") || FStrEq(title, "Extended Upgrades Menu") || StringStartsWith(title, "Upgrades for"));
             /*auto handler = ((IBaseMenu *)menu)->GetHandler();
             if (handler != nullptr && (dynamic_cast<SelectUpgradeWeaponHandler *>(handler) != nullptr || dynamic_cast<SelectUpgradeListHandler *>(handler) != nullptr)) {
                 return true;
@@ -1231,7 +1231,7 @@ namespace Mod::MvM::Extended_Upgrades
         }
 
         if(!Mod::Pop::PopMgr_Extensions::ExtendedUpgradesNoUndo()){
-            ItemDrawInfo info1("ÍË¿îÉý¼¶");
+            ItemDrawInfo info1("é€€æ¬¾å‡çº§");
             menu->AppendItem("1000", info1);
         }
         /*if (upgrades.size() == 1) {
@@ -1270,10 +1270,10 @@ namespace Mod::MvM::Extended_Upgrades
         SelectUpgradeWeaponHandler *handler = new SelectUpgradeWeaponHandler(player);
         IBaseMenu *menu = menus->GetDefaultStyle()->CreateMenu(handler, g_Ext.GetIdentity());
         
-        menu->SetDefaultTitle("Extended Upgrades Menu|À©Õ¹Éý¼¶²Ëµ¥");
+        menu->SetDefaultTitle("Extended Upgrades Menu|æ‰©å±•å‡çº§èœå•");
         menu->SetMenuOptionFlags(0);
 
-        ItemDrawInfo info1("Player Upgrades|Íæ¼ÒÉý¼¶", WeaponHasValidUpgrades(nullptr, player) ? ITEMDRAW_DEFAULT : ITEMDRAW_DISABLED);
+        ItemDrawInfo info1("Player Upgrades|çŽ©å®¶å‡çº§", WeaponHasValidUpgrades(nullptr, player) ? ITEMDRAW_DEFAULT : ITEMDRAW_DISABLED);
         menu->AppendItem("player", info1);
 
         for (loadout_positions_t slot : {
@@ -1300,12 +1300,12 @@ namespace Mod::MvM::Extended_Upgrades
         }
 
         static ConVarRef tf_mvm_respec_enabled("tf_mvm_respec_enabled");
-        ItemDrawInfo info2("Refund Upgrades|ÍË¿îÉý¼¶", tf_mvm_respec_enabled.GetBool() ? ITEMDRAW_DEFAULT : ITEMDRAW_DISABLED);
+        ItemDrawInfo info2("Refund Upgrades|é€€æ¬¾å‡çº§", tf_mvm_respec_enabled.GetBool() ? ITEMDRAW_DEFAULT : ITEMDRAW_DISABLED);
         menu->AppendItem("refund", info2);
 
         if (Mod::Pop::PopMgr_Extensions::HasExtraLoadoutItems(player->GetPlayerClass()->GetClassIndex())) {
             
-            ItemDrawInfo info3("Extra loadout items|×Ô¶¨ÒåÎïÆ·", ITEMDRAW_DEFAULT);
+            ItemDrawInfo info3("Extra loadout items|è‡ªå®šä¹‰ç‰©å“", ITEMDRAW_DEFAULT);
             menu->AppendItem("extra", info3);
         }
 
