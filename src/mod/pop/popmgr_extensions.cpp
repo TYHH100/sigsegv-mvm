@@ -3787,7 +3787,7 @@ namespace Mod::Pop::PopMgr_Extensions
 		SelectMissionInfoHandler *handler = new SelectMissionInfoHandler(player);
         IBaseMenu *menu = menus->GetDefaultStyle()->CreateMenu(handler, g_Ext.GetIdentity());
         
-        menu->SetDefaultTitle("物品替换");
+        menu->SetDefaultTitle("任务介绍");
         menu->SetMenuOptionFlags(MENUFLAG_BUTTON_EXIT);
 
 		auto res = TFObjectiveResource();
