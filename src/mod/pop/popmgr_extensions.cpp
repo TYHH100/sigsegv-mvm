@@ -6214,7 +6214,7 @@ namespace Mod::Pop::PopMgr_Extensions
 			SpewOutputFunc(LocalSpewOutputFunc);
 
 		if (parse_warning) {
-			PrintToChatAll("\x07""ffb2b2""It is possible that a parsing error had occured. Check console for details\n");
+			PrintToChatAll("\x07""ffb2b2"">任务似乎出错了.检查控制台以获取更多信息.\n");
 		}
 		
 		pop_parse_successful = ret;

@@ -52,15 +52,15 @@ namespace Mod::MvM::Upgrade_Disallow
 				const char *upgradename = upgrade->GetUpgradeAttributeName(upgradeslot);
 				
 				if (!cvar_explode_on_ignite.GetBool() && strcmp(upgradename,"explode_on_ignite") == 0){
-					gamehelpers->TextMsg(ENTINDEX(player), TEXTMSG_DEST_CENTER, "¸ÃÈÎÎñ½ûÓÃÁËÓÍÍ°±¬Õ¨Éı¼¶");
+					gamehelpers->TextMsg(ENTINDEX(player), TEXTMSG_DEST_CENTER, "è¯¥ä»»åŠ¡ç¦ç”¨äº†æ²¹æ¡¶çˆ†ç‚¸å‡çº§");
 					return;
 				}
 				else if (!cvar_medigun_shield.GetBool() && strcmp(upgradename,"generate rage on heal") == 0){
-					gamehelpers->TextMsg(ENTINDEX(player), TEXTMSG_DEST_CENTER, "¸ÃÈÎÎñ½ûÓÃÁËÄÜÁ¿»¤¶ÜÉı¼¶");
+					gamehelpers->TextMsg(ENTINDEX(player), TEXTMSG_DEST_CENTER, "è¯¥ä»»åŠ¡ç¦ç”¨äº†èƒ½é‡æŠ¤ç›¾å‡çº§");
 					return;
 				}
 				else if (!cvar_burn_time.GetBool() && strcmp(upgradename,"weapon burn time increased") == 0){
-					gamehelpers->TextMsg(ENTINDEX(player), TEXTMSG_DEST_CENTER, "ºóĞøÈ¼ÉÕÊ±³¤Éı¼¶ÓĞBUG,Çë»»Ò»¸öÉı¼¶");
+					gamehelpers->TextMsg(ENTINDEX(player), TEXTMSG_DEST_CENTER, "åç»­ç‡ƒçƒ§æ—¶é•¿å‡çº§æœ‰BUG,è¯·æ¢ä¸€ä¸ªå‡çº§");
 					return;
 				}
 				else if (strcmp(upgradename,"engy sentry fire rate increased") == 0 &&
@@ -71,7 +71,7 @@ namespace Mod::MvM::Upgrade_Disallow
 					
 					DevMsg("upgrade %f\n",upgrade);
 					if (upgrade >= 0.79f && upgrade <= 0.81f) {
-						gamehelpers->TextMsg(ENTINDEX(player), TEXTMSG_DEST_CENTER, "²½ÉÚÉäËÙÉı¼¶µÄµÚ3µãÓĞBUG,Çë»»Ò»¸öÉı¼¶");
+						gamehelpers->TextMsg(ENTINDEX(player), TEXTMSG_DEST_CENTER, "æ­¥å“¨å°„é€Ÿå‡çº§çš„ç¬¬3ç‚¹æœ‰BUG,è¯·æ¢ä¸€ä¸ªå‡çº§");
 						return;
 					}
 					
