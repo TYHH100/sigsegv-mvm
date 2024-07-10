@@ -161,7 +161,7 @@ void GenerateItemNames() {
         char path_sm[PLATFORM_MAX_PATH];
         g_pSM->BuildPath(Path_SM,path_sm,sizeof(path_sm),"data/sig_item_data3.dat");
         CUtlBuffer fileout( 0, 0, 0 );
-        fileout.PutInt64(filesystem->GetFileTime("resource/tf_schinese.txt", "GAME"));
+        fileout.PutInt64(filesystem->GetFileTime("resource/tf_english.txt", "GAME"));
 
         fileout.PutInt(g_Itemnames.size());
         fileout.PutInt(g_AttribnamesShort.size());
