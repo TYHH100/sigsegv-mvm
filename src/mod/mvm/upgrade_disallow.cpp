@@ -52,7 +52,6 @@ namespace Mod::MvM::Upgrade_Disallow
 				const char *upgradename = upgrade->GetUpgradeAttributeName(upgradeslot);
 				
 				if (!cvar_explode_on_ignite.GetBool() && strcmp(upgradename,"explode_on_ignite") == 0){
-<<<<<<< HEAD
 					gamehelpers->TextMsg(ENTINDEX(player), TEXTMSG_DEST_CENTER, "该任务禁用了油桶爆炸升级");
 					return;
 				}
@@ -62,17 +61,6 @@ namespace Mod::MvM::Upgrade_Disallow
 				}
 				else if (!cvar_burn_time.GetBool() && strcmp(upgradename,"weapon burn time increased") == 0){
 					gamehelpers->TextMsg(ENTINDEX(player), TEXTMSG_DEST_CENTER, "后续燃烧时长升级有BUG,请换一个升级");
-=======
-					gamehelpers->TextMsg(ENTINDEX(player), TEXTMSG_DEST_CENTER, "Explode on ignite is not allowed on this server");
-					return;
-				}
-				else if (!cvar_medigun_shield.GetBool() && strcmp(upgradename,"generate rage on heal") == 0){
-					gamehelpers->TextMsg(ENTINDEX(player), TEXTMSG_DEST_CENTER, "Projectile shield is not allowed on this server");
-					return;
-				}
-				else if (!cvar_burn_time.GetBool() && strcmp(upgradename,"weapon burn time increased") == 0){
-					gamehelpers->TextMsg(ENTINDEX(player), TEXTMSG_DEST_CENTER, "Burn time bonus upgrade is broken. Buy another upgrade");
->>>>>>> parent of ecafeacf ( chi Translations Releases)
 					return;
 				}
 				else if (strcmp(upgradename,"engy sentry fire rate increased") == 0 &&
@@ -83,11 +71,7 @@ namespace Mod::MvM::Upgrade_Disallow
 					
 					DevMsg("upgrade %f\n",upgrade);
 					if (upgrade >= 0.79f && upgrade <= 0.81f) {
-<<<<<<< HEAD
 						gamehelpers->TextMsg(ENTINDEX(player), TEXTMSG_DEST_CENTER, "步哨射速升级的第3点有BUG,请换一个升级");
-=======
-						gamehelpers->TextMsg(ENTINDEX(player), TEXTMSG_DEST_CENTER, "3rd sentry fire rate bonus upgrade is broken. Buy another upgrade");
->>>>>>> parent of ecafeacf ( chi Translations Releases)
 						return;
 					}
 					
