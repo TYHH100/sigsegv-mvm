@@ -112,12 +112,12 @@ void GenerateItemNames() {
     kvin->UsesEscapeSequences(true);
 
     CUtlBuffer file( 0, 0, CUtlBuffer::TEXT_BUFFER );
-    filesystem->ReadFile("resource/tf_schinese.txt", "GAME", file);
+    filesystem->ReadFile("resource/tf_english.txt", "GAME", file);
     
     char buf[4000000];
     _V_UCS2ToUTF8( (const ucs2*) (file.String() + 2), buf, 4000000 );
 
-    if (kvin->LoadFromBuffer("schinese", buf)/**/) {
+    if (kvin->LoadFromBuffer("english", buf)/**/) {
 
         KeyValues *tokens = kvin->FindKey("Tokens");
         std::unordered_map<int, std::string> strings;
@@ -161,7 +161,7 @@ void GenerateItemNames() {
         char path_sm[PLATFORM_MAX_PATH];
         g_pSM->BuildPath(Path_SM,path_sm,sizeof(path_sm),"data/sig_item_data3.dat");
         CUtlBuffer fileout( 0, 0, 0 );
-        fileout.PutInt64(filesystem->GetFileTime("resource/tf_schinese.txt", "GAME"));
+        fileout.PutInt64(filesystem->GetFileTime("resource/tf_english.txt", "GAME"));
 
         fileout.PutInt(g_Itemnames.size());
         fileout.PutInt(g_AttribnamesShort.size());
@@ -192,7 +192,7 @@ void LoadItemNames() {
         char path_sm[PLATFORM_MAX_PATH];
         g_pSM->BuildPath(Path_SM,path_sm,sizeof(path_sm),"data/sig_item_data3.dat");
 
-        long time = filesystem->GetFileTime("resource/tf_schinese.txt", "GAME");
+        long time = filesystem->GetFileTime("resource/tf_english.txt", "GAME");
         CUtlBuffer file( 0, 0, 0 );
 
         if (filesystem->ReadFile(path_sm, "GAME", file)) {
