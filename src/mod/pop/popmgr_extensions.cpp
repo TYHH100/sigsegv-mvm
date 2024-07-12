@@ -3084,11 +3084,11 @@ namespace Mod::Pop::PopMgr_Extensions
 		{
 			if (strtol(str.c_str(), nullptr, 0) == upgradeslot + 1)
 			{	
-				gamehelpers->TextMsg(ENTINDEX(player), TEXTMSG_DEST_CENTER, CFmtStr("%s upgrade is not allowed in this mission", upgradename));
+				gamehelpers->TextMsg(ENTINDEX(player), TEXTMSG_DEST_CENTER, CFmtStr("%s 这个升级在本任务中被禁用了。", upgradename));
 				return false;
 			}
 			else if (FStrEq(upgradename, str.c_str())) {
-				gamehelpers->TextMsg(ENTINDEX(player), TEXTMSG_DEST_CENTER, CFmtStr("%s upgrade is not allowed in this mission", upgradename));
+				gamehelpers->TextMsg(ENTINDEX(player), TEXTMSG_DEST_CENTER, CFmtStr("%s 这个升级在本任务中被禁用了。", upgradename));
 				return false;
 			}
 		}
@@ -3160,7 +3160,7 @@ namespace Mod::Pop::PopMgr_Extensions
 			}
 			
 			if (foundMatch) {
-				gamehelpers->TextMsg(ENTINDEX(player), TEXTMSG_DEST_CENTER, CFmtStr("You cannot buy %s%s upgrades for this weapon in this mission\n%s%s", entry.max != 0 ? "more ": "", upgradename, 
+				gamehelpers->TextMsg(ENTINDEX(player), TEXTMSG_DEST_CENTER, CFmtStr("在此任务中,您无法购买 %s%s 武器升级\n%s%s", entry.max != 0 ? "more ": "", upgradename, 
 				incompatibleItem.c_str(), !incompatibleItem.empty() ? " blocks this upgrade" : ""));
 				return false;
 			}
