@@ -3488,7 +3488,7 @@ namespace Mod::Attr::Custom_Attributes
 					CALL_ATTRIB_HOOK_INT_ON_OTHER ( entity, iCannotUpgrade, cannot_be_upgraded );
 					if (iCannotUpgrade > 0) {
 						if (!sell) {
-							gamehelpers->TextMsg(ENTINDEX(player), TEXTMSG_DEST_CENTER, "This weapon is not upgradeable");
+							gamehelpers->TextMsg(ENTINDEX(player), TEXTMSG_DEST_CENTER, "这把武器无法被升级");
 						}
 						return;
 					}
